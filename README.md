@@ -1,13 +1,14 @@
 # Project Name
 
-> Project description
+Paths / Routes service for 9 trails
 
 ## Related Projects
 
-  - https://github.com/teamName/repo
-  - https://github.com/teamName/repo
-  - https://github.com/teamName/repo
-  - https://github.com/teamName/repo
+  - paths: [Current]
+  - profiles: https://github.com/rpt09-scully/profile-service
+  - photos: https://github.com/rpt09-scully/trail-photos-service
+  - trails: https://github.com/rpt09-scully/trail-service
+  - reviews: https://github.com/rpt09-scully/reviews-service
 
 ## Table of Contents
 
@@ -19,21 +20,16 @@
 
 > Some usage instructions
 
+[To specify]
+
 ## Requirements
 
-An `nvmrc` file is included if using [nvm](https://github.com/creationix/nvm).
-
-- Node 6.13.0
-- etc
+[To specify]
 
 ## Development
 
+[To specify]
+
 ### Installing Dependencies
 
-From within the root directory:
-
-```sh
-npm install -g webpack
-npm install
-```
-
+[To specify]
