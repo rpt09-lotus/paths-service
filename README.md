@@ -1,6 +1,6 @@
-# Project Name
+# Paths Service
 
-Paths / Routes service for 9 trails
+Paths / Routes service for 9 trails.
 
 ## Related Projects
 
