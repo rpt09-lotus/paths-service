@@ -1,0 +1,33 @@
+{
+  "data": {
+      "type": "paths",
+      "id": 1,
+      "attributes": {
+          "user_id": 1,
+          "trail_id": 24,
+          "is_hero_path": false,
+          "date_joined": "2018-03-19",
+          "trail_tags": ["Walking", "Hiking"],
+          "path_data": [
+            ...,
+          {
+            "elev": 4.46,
+            "time": "2018-10-17T18:37:26Z",
+            "lat": 47.644548,
+            "lng": -122.326900
+          },{
+            "elev": 4.94,
+            "time": "2018-10-17T18:37:31Z",
+            "lat": 47.644548,
+            "lng": -122.326897
+          },{
+            "elev": 4.46,
+            "time": "2018-10-17T18:37:34Z",
+            "lat": 47.644560,
+            "lng": -122.326900
+          },
+          ...
+        ]
+      }
+  }
+}
