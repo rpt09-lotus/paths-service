@@ -3,6 +3,7 @@
 # Batch Downloader 
 # Chris Malcolm 2018
 #
+# Install wget first by doing `brew install wget`
 # Download files from server using a list of urls + optional cookies file
 #
 ##
@@ -13,8 +14,9 @@
 listOfUrlsTextFile="./gpxRecordings.txt"
 #output folder relative to current
 outputFolder="gpxFiles"
-# 1 - n seconds delay wait time (for not massive pings to server)
-waitSeconds=3
+# randomRange start - end seconds delay wait time  (for not massive pings to server)
+startRandWaitRange=5
+endRandWaitRange=15
 # we want filename based on a unique segment of url, segments are determined by slashes,
 # if url = http://example.com/item/100/
 # segment array is --> [http:, , example.com, item, 100]
@@ -36,9 +38,9 @@ if [ -f "cookies.txt" ]
                     # make a message
                     echo "downloading $file..."
                     # download files by id name
-                    wget -x --load-cookies 'cookies.txt' -O "$file" "$url"
+                    # wget -x --load-cookies 'cookies.txt' -O "$file" "$url"
                     # randomize delay from 5 - 15 seconds
-                    sleep $[ ( $RANDOM % waitSeconds )  + 1 ]s
+                    sleep $[ ( $RANDOM % endRandWaitRange - startRandWaitRange )  + startRandWaitRange ]s
                 fi
         done < "./gpxRecordings.txt"
     else
