@@ -34,7 +34,19 @@ x Setup Server
 
 ## Requirements
 
-[To specify]
+PostgreSQL is required. It can be installed with brew:
+
+
+``` sh
+# install and start service
+$> brew install PostgreSQL
+$>  brew services start postgresql
+# create the db with `createdb` command
+$> createdb 9trails-paths
+$> pql 9trails-paths #enter to confirm creation
+$ (repl)> \q; #to exit repl
+# seed  db
+$> pql 9trails-paths < db/schema.sql
 
 ## Development Setup
 
