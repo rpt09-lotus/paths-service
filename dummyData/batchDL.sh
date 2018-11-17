@@ -1,20 +1,28 @@
-# settings
+# Adjust settings below
+
+#output folder relative to current
 outputFolder="gpxFiles"
+# 1 - n seconds delay wait time (for not massive pings to server)
 waitSeconds=3
+# we want filename based on a unique segment of url, segments are determined by slashes,
+# if url = http://example.com/item/100/
+# segmentIndex for '100' would be 5
+segmentIndex=8
+extension="gpx"
 
 # Don't edit
 if [ -f "cookies.txt" ]
     then
         while IFS= read -r url;do
-            file="$outputFolder/$(echo $url | cut -d'/' -f 8).gpx";
+            file="$outputFolder/$(echo $url | cut -d'/' -f $segmentIndex).$extension";
                 if [ -f "$file" ]
                 then
                     echo "$file exists...skipping."
                 else
                     # make a message
-                    echo "downloading $(echo $url | cut -d'/' -f 8)..."
+                    echo "downloading $file..."
                     # download files by id name
-                    # wget -x --load-cookies 'cookies.txt' -O "gpxFiles/$(echo $url | cut -d'/' -f 8).gpx" "$url"
+                    wget -x --load-cookies 'cookies.txt' -O "$file" "$url"
                     # randomize delay from 5 - 15 seconds
                     sleep $[ ( $RANDOM % waitSeconds )  + 1 ]s
                 fi
