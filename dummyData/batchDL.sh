@@ -1,5 +1,16 @@
-# Adjust settings below
+## 
+# 
+# Batch Downloader 
+# Chris Malcolm 2018
+#
+# Download files from server using a list of urls + optional cookies file
+#
+##
 
+# Adjust settings below
+# ----------------------
+#1 url per line of url to download
+listOfUrlsTextFile="./gpxRecordings.txt"
 #output folder relative to current
 outputFolder="gpxFiles"
 # 1 - n seconds delay wait time (for not massive pings to server)
@@ -10,7 +21,8 @@ waitSeconds=3
 segmentIndex=8
 extension="gpx"
 
-# Don't edit
+# DONT EDIT
+# ----------------------
 if [ -f "cookies.txt" ]
     then
         while IFS= read -r url;do
