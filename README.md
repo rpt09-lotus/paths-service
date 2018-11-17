@@ -17,7 +17,7 @@ Paths / Routes service for 9 trails.
 ## To dp
 
 - Setup database 
-- Setup Server
+x Setup Server
 - serve routes
   - GET {trailId}/paths?sortBy=date,{asc|desc}
   - POST {trailId}/paths 

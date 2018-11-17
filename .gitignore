@@ -26,3 +26,8 @@ coverage
 build/
 dist/
 
+# dummyData
+gpxFiles/
+cookies.txt
+gpxRecordings.txt
+
