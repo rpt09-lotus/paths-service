@@ -17,8 +17,10 @@ outputFolder="gpxFiles"
 waitSeconds=3
 # we want filename based on a unique segment of url, segments are determined by slashes,
 # if url = http://example.com/item/100/
-# segmentIndex for '100' would be 5
+# segment array is --> [http:, , example.com, item, 100]
+# segmentIndex for '100' would be index 4
 segmentIndex=8
+# extension of file so for our example it would be '100.txt' if we specified 'txt'
 extension="gpx"
 
 # DONT EDIT
