@@ -9,7 +9,8 @@ const csvtojson = require('csvtojson');
  * /////////////////////////////////////////
  */
 
-
+//which type? sql, psql
+const sqlType = 'psql';
 // output path
 const outputPath = path.join(__dirname, '../db/schema.sql');
 // db name
@@ -23,7 +24,7 @@ const DB_TABLES = [{
       trail_id int NOT NULL,
       date bigint,
       user_id int DEFAULT NULL,
-      rating int NOT NULL DEFAULT 0,
+      rating int DEFAULT 0,
       comment text,
       tag text,
       gpx_id int, 
@@ -54,7 +55,8 @@ const gSheets = {
 // schema model for working with data
 class Schema {
 
-  constructor(schemaText) {
+  constructor(schemaText, sqlType='sql') {
+    this.sqlType = sqlType;
     // default left as string
     this.typeMappings = {
       'number': ['date', 'tinyint', 'bigint', 'bigserial', 'serial', 
@@ -85,6 +87,19 @@ class Schema {
   exists(columnName) {
     return this.data[columnName] !== undefined;
   }
+
+  stringify(value) {
+    if (typeof value === 'string') {
+      if (this.sqlType === 'sql') {
+        return JSON.stringify(value);
+      } else {
+        return `'${value.replace(/'/g, "''")}'`
+      }
+    } else {
+      return JSON.stringify(value);
+    }
+  }
+
   // format value as string, number, bool based on colmn aName
   formatValue(value, columnName) {
     value = value.toLowerCase().trim();
@@ -118,28 +133,35 @@ class Schema {
   }
 }
 
-
-var sql = `DROP DATABASE IF EXISTS ${DB_NAME};
-
-CREATE DATABASE ${DB_NAME};
-
-USE ${DB_NAME};
-
+if (sqlType === 'psql') {
+  var sql = '';
+  DB_TABLES.forEach(({tableName}) => {
+    sql += `DROP TABLE IF EXISTS ${tableName};\n`;
+  });
+  sql += '\n';
+} else {
+  var sql = `DROP DATABASE IF EXISTS ${DB_NAME};
+  
+  CREATE DATABASE ${DB_NAME};
+  
+  USE ${DB_NAME};
+  
 `;
+}
 
 
 // table setup
 tableDic = {};
 sql += DB_TABLES.map(({tableName, schema}) => {
   tableDic[tableName] = schema;
-  return `CREATE TABLE ${tableName} (${schema})`
+  return `CREATE TABLE ${tableName} (${schema});`
 }).join('\n\n');
 
 
 
 
 Object.keys(gSheets).forEach( (tableName) => {
-  const schemaModel  = new Schema(tableDic[tableName]);
+  const schemaModel  = new Schema(tableDic[tableName], sqlType);
   // parse schema text into dictionary of columns (key) to {type i.e. string, }
   gSheets[tableName].forEach(async (url) => {
     try{
@@ -150,7 +172,7 @@ Object.keys(gSheets).forEach( (tableName) => {
         Object.keys(row).forEach((key) => {
           key = key.toLowerCase().trim();
           if (schemaModel.exists(key)) {
-            filteredRow[key] = schemaModel.formatValue(row[key], key);
+            filteredRow[key] = schemaModel.stringify(schemaModel.formatValue(row[key], key));
           } else {
             return null;
           }
@@ -158,14 +180,12 @@ Object.keys(gSheets).forEach( (tableName) => {
         return filteredRow;
       });
       sql += '\n';
-      // console.log(finalEntries);
       finalEntries.forEach((cells) => {
-        debugger;
         sql += `
-INSERT INTO ${tableName} (${Object.keys(cells).join(', ')}) VALUES (${Object.keys(cells).map((key) => {return JSON.stringify(cells[key])}).join(', ')})`
+INSERT INTO ${tableName} (${Object.keys(cells).join(', ')}) VALUES (${Object.keys(cells).map((key) => {
+    return cells[key];
+})});`
       });
-      // console.log(finalEntries);
-      // console.log(sql);
       fs.writeFile(outputPath, sql, (err) => {
         if (err) throw err;
         console.log(`sql file has been saved to ${outputPath}!`);

@@ -43,10 +43,13 @@ $> brew install PostgreSQL
 $>  brew services start postgresql
 # create the db with `createdb` command
 $> createdb 9trails-paths
-$> pql 9trails-paths #enter to confirm creation
-$ (repl)> \q; #to exit repl
-# seed  db
+$> pql 9trails-paths #to enter psql repl,  to confirm creation
 $> pql 9trails-paths < db/schema.sql
+# seed  db
+$ (repl)> \dt; #to show all tables (should see 'paths now)
+$ (repl)> \q; #to exit repl
+# woop done!
+
 
 ## Development Setup
 
@@ -71,6 +74,14 @@ $> pql 9trails-paths < db/schema.sql
   $> npm run server-dev
   ```
 
-### Installing Dependencies
+### Log
 
-[To specify]
+#### Seeding the database
+
+To seed the database, I had some acquired data stored in google spreadsheets. Info on how some of this data, specifically the grabbing of gpx files can maybe be seen in `dummyData/` folder. Furthermore, I stored this data in a google spreadsheet as rows and the 1st row being the name of the `column_key` within the database. I then made a quick node script to autogenerate, given a set of configurations + urls to these gSheets, it will create the `*.sql` sql file tha you can use to populate your database. currently it supports postgresql and sql. 
+
+I found it interesting that postgresql:
+
+  - doesn't have the use DATABASE_NAME; drop DATABASE...etc syntax, because to enter the psql repl, you specify the database beforehand
+  - Insert statements don't use double quotes, they're single so additional work to differentiate the two types had to be done.
+  - Error descriptions for invalid sql syntax / schema syntax are much better in postsql.
