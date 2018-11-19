@@ -14,9 +14,9 @@ Paths / Routes service for 9 trails.
   - trails: https://github.com/rpt09-scully/trail-service
   - reviews: https://github.com/rpt09-scully/reviews-service
 
-## To dp
+## To do
 
-- Setup database 
+x Setup database 
 x Setup Server
 - serve routes
   - GET {trailId}/paths?sortBy=date,{asc|desc}
@@ -32,7 +32,7 @@ x Setup Server
 
 [To specify]
 
-## Requirements
+## Development Setup
 
 PostgreSQL is required. It can be installed with brew:
 
@@ -49,34 +49,30 @@ $> pql 9trails-paths < db/schema.sql
 $ (repl)> \dt; #to show all tables (should see 'paths now)
 $ (repl)> \q; #to exit repl
 # woop done!
+```
 
+Inside `.env` place your SQL credentials (change if needed)
 
-## Development Setup
+``` 
+DB_HOST=localhost
+DB_USER=root
+DB_PASS=
+```
 
-  ``` sh
-  # cd into directory
-  $> cd trail-service
-  # install dependencies
-  $> npm install
-  # setup .env file (for sql creds)
-  $> touch .env 
-  # seed database `trailService` (change credentials as needed)
-  $> mysql -uroot < schema.sql  
-  ```
-   Inside `.env` place your SQL credentials (change if needed)
-  ``` 
-  DB_HOST=localhost
-  DB_USER=root
-  DB_PASS=
-  ```
-   To execute:
-   ``` sh
-  $> npm run server-dev
-  ```
+To execute:
+``` sh
+$> npm run server-dev
+```
 
-### Log
+## Log
 
-#### Seeding the database
+### Seeding the database
+
+As outlined in development setup ^, you should have psql installed. As a convenience, the package.json script can be ran to replicate the act of doing the `psql [database] < [sqlFile]` routine.
+``` sh
+# seed the database with the db/schema.sql content
+$> npm run seed-database
+```
 
 To seed the database, I had some acquired data stored in google spreadsheets. Info on how some of this data, specifically the grabbing of gpx files can maybe be seen in `dummyData/` folder. Furthermore, I stored this data in a google spreadsheet as rows and the 1st row being the name of the `column_key` within the database. I then made a quick node script to autogenerate, given a set of configurations + urls to these gSheets, it will create the `*.sql` sql file tha you can use to populate your database. currently it supports postgresql and sql. 
 

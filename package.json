@@ -8,7 +8,8 @@
     "node": ">=6.13.0"
   },
   "scripts": {
-    "server-dev": "nodemon --inspect server/index.js"
+    "server-dev": "nodemon --inspect server/index.js",
+    "seed-database": "psql psql 9trails-paths < ../db/schema.sql"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
