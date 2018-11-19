@@ -9,7 +9,7 @@
   },
   "scripts": {
     "server-dev": "nodemon --inspect server/index.js",
-    "seed-database": "psql psql 9trails-paths < ../db/schema.sql"
+    "seed-database": "psql 9trails-paths < ../db/schema.sql"
   },
   "dependencies": {
     "body-parser": "^1.18.3",

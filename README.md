@@ -54,9 +54,9 @@ $> brew install PostgreSQL
 $>  brew services start postgresql
 # create the db with `createdb` command
 $> createdb 9trails-paths
-$> pql 9trails-paths #to enter psql repl,  to confirm creation
-$> pql 9trails-paths < db/schema.sql
 # seed  db
+$> pql 9trails-paths < db/schema.sql
+$> pql 9trails-paths #to enter psql repl,  to confirm creation
 $ (repl)> \dt; #to show all tables (should see 'paths now)
 $ (repl)> \q; #to exit repl
 # woop done!
