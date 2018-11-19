@@ -1,12 +1,23 @@
 
 
-# Paths Service
+# 1. Paths Service
 
 Paths / Routes service for 9 trails.
 
+<!-- TOC -->
+
+- [1. Paths Service](#1-paths-service)
+  - [1.1. Related Projects](#11-related-projects)
+  - [1.2. To do](#12-to-do)
+  - [1.3. Usage](#13-usage)
+  - [1.4. Development Setup](#14-development-setup)
+  - [1.5. Log](#15-log)
+    - [1.5.1. Seeding the database](#151-seeding-the-database)
+
+<!-- /TOC -->
 
 
-## Related Projects
+## 1.1. Related Projects
 
   - paths: [Current]
   - profiles: https://github.com/rpt09-scully/profile-service
@@ -14,7 +25,7 @@ Paths / Routes service for 9 trails.
   - trails: https://github.com/rpt09-scully/trail-service
   - reviews: https://github.com/rpt09-scully/reviews-service
 
-## To do
+## 1.2. To do
 
 x Setup database 
 x Setup Server
@@ -26,13 +37,13 @@ x Setup Server
 
 
 
-## Usage
+## 1.3. Usage
 
 > Some usage instructions
 
 [To specify]
 
-## Development Setup
+## 1.4. Development Setup
 
 PostgreSQL is required. It can be installed with brew:
 
@@ -64,9 +75,9 @@ To execute:
 $> npm run server-dev
 ```
 
-## Log
+## 1.5. Log
 
-### Seeding the database
+### 1.5.1. Seeding the database
 
 As outlined in development setup ^, you should have psql installed. As a convenience, the package.json script can be ran to replicate the act of doing the `psql [database] < [sqlFile]` routine.
 ``` sh
