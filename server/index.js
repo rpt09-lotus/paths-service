@@ -1,6 +1,7 @@
 const express = require('express');
+const db = require('../db/db.js');
 const app = express();
-const PORT = 3004;
+const PORT = 3005;
 
 app.use((req, res, next) => {
   res.sendJSON = (data) => {
@@ -12,12 +13,28 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/paths', (req, res) => {
+  db.getAll().then((result) => {
+    res.sendJSON(result.rows);
+  }).catch((error) => {
+    res.errorJSON(`${error}`, 500);
+  });
+});
+
 app.get('/:trailId/paths', (req, res) => {
-  res.sendJSON('Coming soon... paths route.');
+  db.getPathsByTrailId(req.params.trailId).then((result) => {
+    res.sendJSON(result.rows);
+  }).catch((error) => {
+    res.errorJSON(`${error}`, 500);
+  });
 });
 
 app.get('/:trailId/heroPath',(req, res) => {
-  res.sendJSON('Coming soon... hero path route.');
+  db.getHeroPathByTrailId(req.params.trailId).then((result) => {
+    res.sendJSON(result.rows);
+  }).catch((error) => {
+    res.errorJSON(`${error}`, 500);
+  });
 })
 
 app.get('/:trailId/trailHead', (req, res) => {
