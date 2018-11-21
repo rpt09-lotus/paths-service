@@ -40,8 +40,8 @@ const DB_TABLES = [{
 const gSheets = {
   // table name --> list of sheets to populate from
   'paths': [
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vR8SO2Qiqz0gcHvVSLvzLtIXefde65XQM25jZBWbAkC8D5EKuZRIWZS_Z3JroUVjF1IoIBw1Y7b0rCb/pub?gid=1804747731&single=true&output=csv",
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vR8SO2Qiqz0gcHvVSLvzLtIXefde65XQM25jZBWbAkC8D5EKuZRIWZS_Z3JroUVjF1IoIBw1Y7b0rCb/pub?gid=2138298506&single=true&output=csv"
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vR8SO2Qiqz0gcHvVSLvzLtIXefde65XQM25jZBWbAkC8D5EKuZRIWZS_Z3JroUVjF1IoIBw1Y7b0rCb/pub?gid=2138298506&single=true&output=csv",
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vR8SO2Qiqz0gcHvVSLvzLtIXefde65XQM25jZBWbAkC8D5EKuZRIWZS_Z3JroUVjF1IoIBw1Y7b0rCb/pub?gid=1804747731&single=true&output=csv"
 ]};
 
 
@@ -102,14 +102,14 @@ class Schema {
 
   // format value as string, number, bool based on colmn aName
   formatValue(value, columnName) {
-    value = value.toLowerCase().trim();
+    value = value.trim();
     if (value === 'null' || value === '') {
       return null;
     }
     if (this.exists(columnName)) {
       switch(this.data[columnName]) {
         case 'boolean':
-          switch(value) {
+          switch(value.toLowerCase()) {
             case 'true':
             case '1':
             case 1:
