@@ -4,6 +4,7 @@ const app = express();
 const PORT = 3005;
 
 app.use((req, res, next) => {
+  db.host = req.protocol + '://' + req.headers.host;
   res.sendJSON = (data) => {
     res.status(200).end(JSON.stringify({data}))
   }
@@ -15,7 +16,15 @@ app.use((req, res, next) => {
 
 app.get('/paths', (req, res) => {
   db.getAll().then((result) => {
-    res.sendJSON(result.rows);
+    res.sendJSON(result);
+  }).catch((error) => {
+    res.errorJSON(`${error}`, 500);
+  });
+});
+
+app.get('/paths/:pathId', (req, res) => {
+  db.getPathById(req.params.pathId).then((result) => {
+    res.sendJSON(result);
   }).catch((error) => {
     res.errorJSON(`${error}`, 500);
   });
@@ -23,7 +32,7 @@ app.get('/paths', (req, res) => {
 
 app.get('/:trailId/paths', (req, res) => {
   db.getPathsByTrailId(req.params.trailId).then((result) => {
-    res.sendJSON(result.rows);
+    res.sendJSON(result);
   }).catch((error) => {
     res.errorJSON(`${error}`, 500);
   });
@@ -31,14 +40,18 @@ app.get('/:trailId/paths', (req, res) => {
 
 app.get('/:trailId/heroPath',(req, res) => {
   db.getHeroPathByTrailId(req.params.trailId).then((result) => {
-    res.sendJSON(result.rows);
+    res.sendJSON(result);
   }).catch((error) => {
     res.errorJSON(`${error}`, 500);
   });
 })
 
 app.get('/:trailId/trailHead', (req, res) => {
-  res.sendJSON('Coming soon... trail Head.');
+  db.getTrailHeadById(req.params.trailId).then((result) => {
+    res.sendJSON(result);
+  }).catch((error) => {
+    res.errorJSON(`${error}`, 500);
+  });
 })
 
 app.get('*', (req, res) => {
