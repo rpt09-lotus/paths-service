@@ -3,7 +3,8 @@
 # 1. Paths Service
 
 Paths / Routes service for 9 trails.
-
+  
+  - [1.1. Related Projects](#11-related-projects)
   - [1.2. To do](#12-to-do)
   - [1.3. Usage](#13-usage)
     - [1.3.1. API endpoints](#131-api-endpoints)
@@ -42,7 +43,7 @@ x Setup Server
 
 Below you can find all available endpoints. 
 
-Note: that those with an asterisk *(*)* will have more detailed information , aka actual point data for creating a visual path. Because this is significantly more data, requests that recieve multiple paths likely will not provide this.
+Note: that those with an asterisk *(\*)* will have more detailed information , aka actual point data for creating a visual path. Because this is significantly more data, requests that recieve multiple paths likely will not provide this.
 
   - GET `/paths` 
     - retrieves all paths in database (shouldn't really be used except for testing)
@@ -50,7 +51,7 @@ Note: that those with an asterisk *(*)* will have more detailed information , ak
     - retrieves all recordings / paths for a specified trail id.
   - GET `/paths/:pathId` * 
     - retrieves detailed information about a path by a given ID in database. this also will retrieve gpx data.
-  - GET `/:trailId//heroPath` * 
+  - GET `/:trailId/heroPath` * 
     - retrieves detailed information about the canonical path for a given trail data. this also will retrieve gpx data.
   - GET `/:trailId/trailHead` * 
     - retrieves first point of the canonical path for a given trail from the database if available.
@@ -67,7 +68,7 @@ $>  brew services start postgresql
 # create the db with `createdb` command
 $> createdb 9trails-paths
 # seed  db
-$> pql 9trails-paths < db/schema.sql
+$> npm run seed-database
 $> pql 9trails-paths #to enter psql repl,  to confirm creation
 $ (repl)> \dt; #to show all tables (should see 'paths now)
 $ (repl)> \q; #to exit repl
@@ -85,7 +86,7 @@ PORT=3005
 
 To execute:
 ``` sh
-$> npm run server-dev
+$> npm run server-dev #should be running on 3005
 ```
 
 ## 1.5. Log
