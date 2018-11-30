@@ -1,8 +1,11 @@
 const express = require('express');
 const db = require('../db/db.js');
+const validator = require('../services/validator.js');
+const bodyParser = require('body-parser');
 const app = express();
 const PORT = 3005;
 
+app.use(bodyParser.json());
 app.use((req, res, next) => {
   db.host = req.protocol + '://' + req.headers.host;
   res.sendJSON = (data) => {
@@ -37,6 +40,14 @@ app.get('/:trailId/paths', (req, res) => {
     res.errorJSON(`${error}`, 500);
   });
 });
+
+app.post('/:trailId/paths', (req, res) => {
+  validator.validate(req.body).then((result) => {
+    res.sendJSON(result);
+  }).catch((error) => {
+    res.errorJSON(`${error}`, 400);
+  });
+})
 
 app.get('/:trailId/heroPath',(req, res) => {
   db.getHeroPathByTrailId(req.params.trailId).then((result) => {

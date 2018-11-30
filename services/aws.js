@@ -7,36 +7,43 @@ module.exports = {
   getS3Url: function(file) {
     return `${this.URL_PREFIX}${file}`
   },
-  readGPXByUrl: function(url) {
-
-    return requestPromise(url).then(xml => {
-      let json = xml2json.toJson(xml);
-      json = JSON.parse(json);
-      if (json.gpx && json.gpx.metadata && json.gpx.metadata.bounds ) {
-        let points = [];
-        const gpx = json.gpx;
-        if (gpx.rte && gpx.rte.rtept) {
-          points = gpx.rte.rtept;
-        } else if (gpx.trk && gpx.trk.trkseg) {
-          if (Array.isArray(gpx.trk.trkseg)) {
-            gpx.trk.trkseg.forEach((el) => {
-              if (Array.isArray(el.trkpt)) {
-                points = points.concat(el.trkpt);
-              }
-            });
-          } else {
-            points = gpx.trk.trkseg.trkpt;
-          }
+  validateGPX: function(xml) {
+    return this.parseGPX(xml).then(() => {
+      return true
+    })
+  },
+  parseGPX: async function(xml) {
+    let json = xml2json.toJson(xml);
+    json = JSON.parse(json);
+    if (json.gpx && json.gpx.metadata && json.gpx.metadata.bounds ) {
+      let points = [];
+      const gpx = json.gpx;
+      if (gpx.rte && gpx.rte.rtept) {
+        points = gpx.rte.rtept;
+      } else if (gpx.trk && gpx.trk.trkseg) {
+        if (Array.isArray(gpx.trk.trkseg)) {
+          gpx.trk.trkseg.forEach((el) => {
+            if (Array.isArray(el.trkpt)) {
+              points = points.concat(el.trkpt);
+            }
+          });
         } else {
-          throw 'Could not find points of gpx file!'
-        }
-        return {
-          bounds: gpx.metadata.bounds,
-          points: points
+          points = gpx.trk.trkseg.trkpt;
         }
       } else {
-        throw 'Not a valid gpx file';
+        throw 'Could not find points of gpx file!'
       }
+      return {
+        bounds: gpx.metadata.bounds,
+        points: points
+      }
+    } else {
+      throw 'Not a valid gpx file';
+    }
+  },
+  readGPXByUrl: function(url) {
+    return requestPromise(url).then(xml => {
+      return this.parseGPX(xml);
     })
   }
 };
