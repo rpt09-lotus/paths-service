@@ -15,7 +15,6 @@ module.exports = {
       if (json.gpx && json.gpx.metadata && json.gpx.metadata.bounds ) {
         let points = [];
         const gpx = json.gpx;
-        debugger;
         if (gpx.rte && gpx.rte.rtept) {
           points = gpx.rte.rtept;
         } else if (gpx.trk && gpx.trk.trkseg) {

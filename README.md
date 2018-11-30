@@ -1,5 +1,3 @@
-
-
 # 1. Paths Service
 
 Paths / Routes service for 9 trails.
@@ -12,6 +10,7 @@ Paths / Routes service for 9 trails.
   - [1.5. Log](#15-log)
     - [1.5.1. Seeding the database](#151-seeding-the-database)
     - [1.5.2. Setting up the API](#152-setting-up-the-api)
+    - [1.5.3. Backfilling entries via a seededRandom](#153-backfilling-entries-via-a-seededrandom)
 
 ## 1.1. Related Projects
 
@@ -120,3 +119,25 @@ I have two areas that will need enriching, data-wise.
   - *Trail Entries 21-100*. Trail Entries 1-20 contain valid information, but 21-100 currently don't exist. Need a strategy for backfilling this.
   - *Recordings with missing gpx data*. For trails 1-20, we have the canonical / hero paths. but for the rest as well as for the various recordings (user submitted routes),
   we simply do not have every single gpx file on S3. these currently will leave the `gpx_data` entry null. Need a way to swap out with an actual gpx file we have as a placeholder and maybe also include a attribute to describe this swap!
+
+### 1.5.3. Backfilling entries via a seededRandom
+
+So to solve the previous 2 issues, outside of getting banned temporarily for trying to 'aquire' accurate gpx data, I still had quite a gap in both actual gpx files and just recordings ^^ as mentioned above. I had about 70/100 of the canonical trails' gpx data, and had about 50% (220/447) of the gpx recordings (user submitted paths). Given my cease and desist, I decided to backfill using a random seed strategy. 
+
+* Snippet from db.js *
+
+``` js
+    // the seed can provide a consistent random number based off the id of the path
+    seededRandom: function(seed) {
+    seed = (seed * 9301 + 49297) % 233280;
+    var rnd = seed / 233280;
+    return rnd;
+  },
+```
+* How I resolved*
+  - *Trail Entries 70-100 canonical gpx's + 50% recordings does not have valid gpx_url*
+    - for those canonical gpx files that are missing ^, I used the id (70-100) to generate a psuedo-random value, that would then be used to consistently grab a gpx file from the valid pool that I DO have. As a means to notify users of api endpoint, the api also appends an additional property called `backfilled_gpx_url` which reaveals which gpx_url was used. Again this is consistent due to the seed function
+
+  - *Backfilling trails with dummy user recordings*
+    - so the previous thing would give us fake gpx data for those missing on canonical trails (`hero_path`) and our 50% of recordings, but user recordings for a bunch don't exist since I only got up to maybe trail 20 for actual data! So to make every trail (0-100), seem like they have a user submitted recording, or series of recordings, I also used that function to backfill anywhere from `1-3 recordings` if none we're present on the trail!. As a means to notify users of api endpoint, the api also appends 2 additional properties called `backfilled_recording` (boolean, set to true)
+    `backfilled_from_trail` (integer, which reaveals which the actual trail it was plucked from). Again this is consistent due to the seed function.
