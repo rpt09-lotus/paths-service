@@ -13,12 +13,21 @@ module.exports = {
       let json = xml2json.toJson(xml);
       json = JSON.parse(json);
       if (json.gpx && json.gpx.metadata && json.gpx.metadata.bounds ) {
-        let points;
+        let points = [];
         const gpx = json.gpx;
+        debugger;
         if (gpx.rte && gpx.rte.rtept) {
           points = gpx.rte.rtept;
-        } else if (gpx.trk && gpx.trk.trkseg && gpx.trk.trkseg.trkpt) {
-          points = gpx.trk.trkseg.trkpt;
+        } else if (gpx.trk && gpx.trk.trkseg) {
+          if (Array.isArray(gpx.trk.trkseg)) {
+            gpx.trk.trkseg.forEach((el) => {
+              if (Array.isArray(el.trkpt)) {
+                points = points.concat(el.trkpt);
+              }
+            });
+          } else {
+            points = gpx.trk.trkseg.trkpt;
+          }
         } else {
           throw 'Could not find points of gpx file!'
         }

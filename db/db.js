@@ -42,7 +42,7 @@ module.exports = {
           const json =  await awsHelper.readGPXByUrl( awsHelper.getS3Url(obj.gpx_url));
           return json;
         } catch (e) {
-          console.log('error: couldn\'t parse obj.gpx_url');
+          console.log('error: couldn\'t parse obj.gpx_url:', e);
           return null;
         }
       }

@@ -21,7 +21,7 @@ endRandWaitRange=60
 # if url = http://example.com/item/100/
 # segment array is --> [http:, , example.com, item, 100]
 # segmentIndex for '100' would be index 4
-segmentIndex=6
+segmentIndex=7
 # extension of file so for our example it would be '100.txt' if we specified 'txt'
 extension="gpx"
 
@@ -38,11 +38,11 @@ if [ -f "cookies.txt" ]
                     # make a message
                     echo "downloading $file..."
                     # download files by id name
-                    # wget -x --load-cookies 'cookies.txt' -O "$file" "$url"
+                    wget -x --load-cookies 'cookies.txt' -O "$file" "$url"
                     # randomize delay from 5 - 15 seconds
                     sleep $[ ( $RANDOM % endRandWaitRange - startRandWaitRange )  + startRandWaitRange ]s
                 fi
-        done < "./gpxRecordings.txt"
+        done < "$listOfUrlsTextFile"
     else
         echo 
         echo "cookies.txt file must be in this same directory. It can be blank, if no cookies are needed."

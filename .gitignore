@@ -28,6 +28,7 @@ dist/
 
 # dummyData
 gpxFiles/
+canonicalGpxFiles/
 cookies.txt
 gpxRecordings.txt
 
