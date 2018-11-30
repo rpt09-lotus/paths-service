@@ -11,6 +11,7 @@ Paths / Routes service for 9 trails.
     - [1.5.1. Seeding the database](#151-seeding-the-database)
     - [1.5.2. Setting up the API](#152-setting-up-the-api)
     - [1.5.3. Backfilling entries via a seededRandom](#153-backfilling-entries-via-a-seededrandom)
+    - [1.5.4. Validation service](#154-validation-service)
 
 ## 1.1. Related Projects
 
@@ -25,13 +26,23 @@ Paths / Routes service for 9 trails.
 ```
 x Setup database 
 x Setup Server
-- serve routes
+x serve routes
   x base routes
-  - POST {trailId}/paths 
-- do sorting for paths/
-  - GET {trailId}/paths?sortBy=date,{asc|desc}
+  x POST {trailId}/path
+- do sorting for recordings/
+  - GET {trailId}/recordings?sortBy=date,{asc|desc}
+  - GET {trailId}/recordings?sortBy=ranking,{asc|desc}
 x fill 21 + 100 with backfill data since these entries dont exist
 x for paths that we dont have on S3, backfill this data from a set of data that we do have
+- Save posts to database and upload xml file to S3
+- test suite
+  - unit tests 
+    - db
+    - validation
+    - aws
+  - integration
+    - endpoints
+
 ```
 
 
@@ -145,3 +156,29 @@ So to solve the previous 2 issues, outside of getting banned temporarily for try
   - *Backfilling trails with dummy user recordings*
     - so the previous thing would give us fake gpx data for those missing on canonical trails (`hero_path`) and our 50% of recordings, but user recordings for a bunch don't exist since I only got up to maybe trail 20 for actual data! So to make every trail (0-100), seem like they have a user submitted recording, or series of recordings, I also used that function to backfill anywhere from `1-3 recordings` if none we're present on the trail!. As a means to notify users of api endpoint, the api also appends 2 additional properties called `backfilled_recording` (boolean, set to true)
     `backfilled_from_trail` (integer, which reaveals which the actual trail it was plucked from). Again this is consistent due to the seed function.
+
+### 1.5.4. Validation service
+
+In creating the post endpoint, a validation service was used where one can supply required fields and async validation callbacks as an array of object literals. then calling `validator.validate(req.body)` returns a promise.
+
+Below is a snippet of that service Dictionary.
+
+``` js
+  {
+    name: 'ranking',
+    type: 'number',
+    errorMessage: 'is not between 0 & 5',
+    validator: (val) => {
+      return (0 < val && val <=5)
+    }
+  },
+  {
+    name: 'gpx',
+    type: 'string',
+    required: true, 
+    errorMessage: 'is not a valid gpx file',
+    validator: (val) => {
+      return aws.validateGPX(val); ///returns promise
+    }
+  }
+```
