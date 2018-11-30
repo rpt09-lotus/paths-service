@@ -22,6 +22,34 @@ module.exports = {
   },
   /**
    * 
+   * @param {string} sortBy column to sort by
+   * @param {string} ascOrDesc asc or desc string
+   */
+  validateSortOptions: function(sortBy, ascOrDesc) {
+    const VALID_SORT_OPTIONS =  {
+      ascOrDesc: ['asc', 'desc'],
+      sortBy: ['id', 'rating', 'date'],
+    };
+    return (
+        VALID_SORT_OPTIONS.sortBy.indexOf(sortBy.toLowerCase()) !== -1 &&
+        VALID_SORT_OPTIONS.ascOrDesc.indexOf(ascOrDesc.toLowerCase()) !== -1
+    );
+  },
+  generateOrderString: function(sortBy, ascOrDesc) {
+    return `${sortBy} ${ascOrDesc}`;
+  },
+  sortBy: function([...arr], sortBy, ascOrDesc) {
+    arr.sort((a, b) => {
+      if (ascOrDesc.toLowerCase() === 'asc') {
+        return a[sortBy] - b[sortBy];
+      } else {
+        return b[sortBy] - a[sortBy];
+      }
+    })
+    return arr;
+  },
+  /**
+   * 
    * @param {Object} pathObjects path objects to format
    * @param {Array} toFormat array of keys you would like to format (must be available in mappings)
    */
@@ -105,40 +133,48 @@ module.exports = {
     });
   },
   
-  getPathsByTrailId: function(id) {
-    return  client.query('SELECT * FROM paths WHERE trail_id=$1', [id]).then((data) => {
+  getPathsByTrailId: function(id, sortBy='id', ascOrDesc='DESC') {
+    if (!this.validateSortOptions(sortBy, ascOrDesc)) {
+      return new Promise((res, rej) => {rej('Sort options not valid!')});
+    }
+    return  client.query('SELECT * FROM paths WHERE trail_id=$1 ORDER BY ' + 
+    this.generateOrderString(sortBy, ascOrDesc), [id]).then((data) => {
       return this.formatDataAll(data.rows, [...this.baseFormatting]);
     }).then((rows) => {
       // backfill if we don't have any recordings
       if (rows.length <= 1) {
         return this.getBackfilledRecordings(id).then((backfilledRows) => {
-          return rows.concat(backfilledRows);
+          return this.sortBy(rows.concat(backfilledRows), sortBy, ascOrDesc);
         })
       } else {
 
-        return rows;
+        return this.sortBy(rows, sortBy, ascOrDesc);
       }
     });
   },
-  getRecordingsByTrailId: function(id) {
-    return  client.query('SELECT * FROM paths WHERE trail_id=$1 AND is_hero_path=$2', [id, false]).then((data) => {
+  getRecordingsByTrailId: function(id, sortBy='id', ascOrDesc='DESC') {
+    if (!this.validateSortOptions(sortBy, ascOrDesc)) {
+      return new Promise((res, rej) => {rej('Sort options not valid!')});
+    }
+
+    return  client.query('SELECT * FROM paths WHERE trail_id=$1 AND is_hero_path=$2 ORDER BY ' + 
+    this.generateOrderString(sortBy, ascOrDesc), [id, false]).then((data) => {
       return this.formatDataAll(data.rows, [...this.baseFormatting]);
     }).then((rows) => {
       // backfill if we don't have any recordings
       if (rows.length === 0) {
-        return this.getBackfilledRecordings(id).then((backfilledRows) => {
-          return rows.concat(backfilledRows);
+        return this.getBackfilledRecordings(id, sortBy, ascOrDesc).then((backfilledRows) => {
+          return this.sortBy(rows.concat(backfilledRows), sortBy, ascOrDesc);
         })
       } else {
 
-        return rows;
+        return this.sortBy(rows, sortBy, ascOrDesc);;
       }
     });
   },
   getBackfilledRecordings: function(id) {
     const MAX_EXTRA_RECORDINGS = 3;
-
-    return  client.query('SELECT * FROM paths WHERE trail_id!=$1 and have_gpx=$2', [id, true]).then((data) => {
+    return  client.query('SELECT * FROM paths WHERE trail_id!=$1 and have_gpx=$2  AND is_hero_path=$3', [id, true, false]).then((data) => {
       return this.formatDataAll(data.rows, [...this.baseFormatting]);
     }).then(data => {
       const backfillAmount = 1 + Math.floor( this.seededRandom(id) * MAX_EXTRA_RECORDINGS);
@@ -147,6 +183,7 @@ module.exports = {
         item = data[Math.floor(this.seededRandom(id * (index + 1)) * data.length)];
         item.backfilled_recording = true;
         item.backfilled_from_trail = item.trail_id;
+        item.comment = null;
         item.trail_id = parseInt(id);
         return item;
       });
@@ -158,7 +195,7 @@ module.exports = {
     });
   },
   getValidGPXs: function() {
-    return client.query('SELECT gpx_url FROM paths WHERE have_gpx=$1', [true]).then((data) => {
+    return client.query('SELECT gpx_url FROM paths WHERE have_gpx=$1 AND is_hero_path=$2', [true, false]).then((data) => {
       return data.rows.map((row) => {
         return row.gpx_url;
       });

@@ -29,9 +29,9 @@ x Setup Server
 x serve routes
   x base routes
   x POST {trailId}/path
-- do sorting for recordings/
-  - GET {trailId}/recordings?sortBy=date,{asc|desc}
-  - GET {trailId}/recordings?sortBy=ranking,{asc|desc}
+x do sorting for recordings/
+  x GET {trailId}/recordings?sortBy=date,{asc|desc}
+  x GET {trailId}/recordings?sortBy=ranking,{asc|desc}
 x fill 21 + 100 with backfill data since these entries dont exist
 x for paths that we dont have on S3, backfill this data from a set of data that we do have
 - Save posts to database and upload xml file to S3
@@ -57,10 +57,10 @@ Note: that those with an asterisk *(\*)* will have more detailed information , a
 
   - GET `/paths` 
     - retrieves all paths in database (shouldn't really be used except for testing)
-  - GET `/:trailId/paths`
-    - retrieves all recordings / paths for a specified trail id.
-  - GET `/:trailId/recordings`
-    - retrieves all recordings (excluding hero path) for a specified trail id.
+  - GET `/:trailId/paths?sortBy={id|rating|date},{asc|desc}*`
+    - retrieves all recordings / paths for a specified trail id. sort optionas as shown (optional!)
+  - GET `/:trailId/recordings?sortBy={id|rating|date},{asc|desc}*`
+    - retrieves all recordings (excluding hero path) for a specified trail id. sort optionas as shown (optional!)
   - POST `/:trailId/recordings`
     - post a user path recording to a specified trail id.
   - GET `/paths/:pathId` * 
