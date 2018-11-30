@@ -30,8 +30,8 @@ x Setup Server
   - POST {trailId}/paths 
 - do sorting for paths/
   - GET {trailId}/paths?sortBy=date,{asc|desc}
-- fill 21 + 100 with backfill data since these entries dont exist
-- for paths that we dont have on S3, backfill this data from a set of data that we do have
+x fill 21 + 100 with backfill data since these entries dont exist
+x for paths that we dont have on S3, backfill this data from a set of data that we do have
 ```
 
 
