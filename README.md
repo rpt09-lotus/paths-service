@@ -48,6 +48,10 @@ Note: that those with an asterisk *(\*)* will have more detailed information , a
     - retrieves all paths in database (shouldn't really be used except for testing)
   - GET `/:trailId/paths`
     - retrieves all recordings / paths for a specified trail id.
+  - GET `/:trailId/recordings`
+    - retrieves all recordings (excluding hero path) for a specified trail id.
+  - POST `/:trailId/recordings`
+    - post a user path recording to a specified trail id.
   - GET `/paths/:pathId` * 
     - retrieves detailed information about a path by a given ID in database. this also will retrieve gpx data.
   - GET `/:trailId/heroPath` * 

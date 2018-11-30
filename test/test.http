@@ -1,12 +1,12 @@
 ### missing everything
-POST http://localhost:3005/3/paths HTTP/1.1
+POST http://localhost:3005/3/recordings HTTP/1.1
 content-type: application/json
 
 {
 }
 
 ### missing date
-POST http://localhost:3005/3/paths HTTP/1.1
+POST http://localhost:3005/3/recordings HTTP/1.1
 content-type: application/json
 
 {
@@ -15,7 +15,7 @@ content-type: application/json
 
 #### including date, but gpx missing
 
-POST http://localhost:3005/3/paths HTTP/1.1
+POST http://localhost:3005/3/recordings HTTP/1.1
 content-type: application/json
 
 {
@@ -24,7 +24,7 @@ content-type: application/json
 }
 #### not  valid xml
 
-POST http://localhost:3005/3/paths HTTP/1.1
+POST http://localhost:3005/3/recordings HTTP/1.1
 content-type: application/json
 
 {
@@ -35,7 +35,7 @@ content-type: application/json
 
 #### not valid gpx file, but valid xml
 
-POST http://localhost:3005/3/paths HTTP/1.1
+POST http://localhost:3005/3/recordings HTTP/1.1
 content-type: application/json
 
 {
@@ -46,7 +46,7 @@ content-type: application/json
 
 #### comment must be a string
 
-POST http://localhost:3005/3/paths HTTP/1.1
+POST http://localhost:3005/3/recordings HTTP/1.1
 content-type: application/json
 
 {
@@ -57,7 +57,7 @@ content-type: application/json
 
 #### date cant be blank brah
 
-POST http://localhost:3005/3/paths HTTP/1.1
+POST http://localhost:3005/3/recordings HTTP/1.1
 content-type: application/json
 
 {
@@ -68,7 +68,7 @@ content-type: application/json
 
 #### user cannot exceed 100
 
-POST http://localhost:3005/3/paths HTTP/1.1
+POST http://localhost:3005/3/recordings HTTP/1.1
 content-type: application/json
 
 {
@@ -81,7 +81,7 @@ content-type: application/json
 
 #### ranking not exceeding 5
 
-POST http://localhost:3005/3/paths HTTP/1.1
+POST http://localhost:3005/3/recordings HTTP/1.1
 content-type: application/json
 
 {
@@ -94,7 +94,7 @@ content-type: application/json
 
 #### valid gpx file
 
-POST http://localhost:3005/3/paths HTTP/1.1
+POST http://localhost:3005/3/recordings HTTP/1.1
 content-type: application/json
 
 {

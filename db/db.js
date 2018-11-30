@@ -104,12 +104,28 @@ module.exports = {
       return this.formatDataAll(data.rows, [...this.baseFormatting]);
     });
   },
+  
   getPathsByTrailId: function(id) {
     return  client.query('SELECT * FROM paths WHERE trail_id=$1', [id]).then((data) => {
       return this.formatDataAll(data.rows, [...this.baseFormatting]);
     }).then((rows) => {
       // backfill if we don't have any recordings
       if (rows.length <= 1) {
+        return this.getBackfilledRecordings(id).then((backfilledRows) => {
+          return rows.concat(backfilledRows);
+        })
+      } else {
+
+        return rows;
+      }
+    });
+  },
+  getRecordingsByTrailId: function(id) {
+    return  client.query('SELECT * FROM paths WHERE trail_id=$1 AND is_hero_path=$2', [id, false]).then((data) => {
+      return this.formatDataAll(data.rows, [...this.baseFormatting]);
+    }).then((rows) => {
+      // backfill if we don't have any recordings
+      if (rows.length === 0) {
         return this.getBackfilledRecordings(id).then((backfilledRows) => {
           return rows.concat(backfilledRows);
         })

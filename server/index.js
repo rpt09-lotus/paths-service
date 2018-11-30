@@ -41,7 +41,15 @@ app.get('/:trailId/paths', (req, res) => {
   });
 });
 
-app.post('/:trailId/paths', (req, res) => {
+app.get('/:trailId/recordings', (req, res) => {
+  db.getRecordingsByTrailId(req.params.trailId).then((result) => {
+    res.sendJSON(result);
+  }).catch((error) => {
+    res.errorJSON(`${error}`, 500);
+  });
+});
+
+app.post('/:trailId/recordings', (req, res) => {
   validator.validate(req.body).then((result) => {
     res.sendJSON(result);
   }).catch((error) => {
