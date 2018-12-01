@@ -5,13 +5,13 @@ const {willHaveErrorResponse, willHaveValidResponse, getFirstAndLast } = require
 describe('endpoints tests', () => {
 
 
-// POST /:trailId/recordings
-// post a user path recording to a specified trail id.
-// GET /paths/:pathId *
-// retrieves detailed information about a path by a given ID in database. this also will retrieve gpx data.
-// GET /:trailId/heroPath *
-// retrieves detailed information about the canonical path for a given trail data. this also will retrieve gpx data.
-// GET /:trailId/trailHead *
+  const validateHasGpxData = (pathObj) => {
+    expect(pathObj.gpx_data).toBeDefined();
+    expect(pathObj.gpx_data.bounds).toBeDefined();
+    expect(pathObj.gpx_data.bounds).not.toBeNull();
+    expect(pathObj.gpx_data.points).toBeDefined();
+    expect(pathObj.gpx_data.points).not.toBeNull();
+  }
 
   it('return 404 and error for invalid path', () => {
     return willHaveErrorResponse('/im_an_invalid_path', 404, () => {
@@ -39,6 +39,60 @@ describe('endpoints tests', () => {
     });
     return Promise.all(promises);
   });
+
+  it('GET /:trailId/trailHead (detail info on beginning trail)', () => {
+    // test different routes
+    const idsToTest = [1,2];
+
+    const promises = idsToTest.map((id) => {
+      return willHaveValidResponse(`/${id}/trailHead`, (json) => {
+        expect(json.data.length).toEqual(1);
+        const pathObj = json.data[0];
+        expect(pathObj.trailHead).toBeDefined();
+        expect(pathObj.trailHead).not.toBeNull();
+        expect(Object.keys(pathObj.trailHead).length).toEqual(3);
+        ['lat', 'lon', 'ele'].forEach((att) => {
+          expect(pathObj.trailHead[att]).toBeDefined();
+        });
+
+      });
+    });
+    return Promise.all(promises);
+  });
+
+  it('GET /:trailId/heroPath (detail info on hero path including gpx data)', () => {
+    // test different routes
+    const idsToTest = [1,2];
+
+    const promises = idsToTest.map((id) => {
+      return willHaveValidResponse(`/${id}/heroPath`, (json) => {
+        expect(json.data.length).toEqual(1);
+        const pathObj = json.data[0];
+        expect(pathObj.trail_id).toEqual(id);
+        expect(pathObj.is_hero_path).toEqual(true);
+        validateHasGpxData(pathObj);
+
+      });
+    });
+    return Promise.all(promises);
+  });
+
+
+  it('GET /paths/:pathId (detail info on path including gpx data)', () => {
+    // test different routes
+    const idsToTest = [1,2];
+
+    const promises = idsToTest.map((id) => {
+      return willHaveValidResponse(`/paths/${id}`, (json) => {
+        expect(json.data.length).toEqual(1);
+        const pathObj = json.data[0];
+        expect(pathObj.id).toEqual(id);
+        validateHasGpxData(pathObj);
+      });
+    });
+    return Promise.all(promises);
+  });
+
 
   it('GET /:trailId/recordings', () => {
     // test different routes
@@ -102,7 +156,43 @@ describe('endpoints tests', () => {
     return Promise.all(promises);
   });
 
-  it('GET /:trailId/recordings can be sorted by rating or date', () => {
+  it('GET /:trailId/recordings returns error on invalid sort key', () => {
+    const idsToTest = [1];
+
+    const promises = idsToTest.map((id) => {
+      return willHaveErrorResponse(`/${id}/recordings?sortBy=invalid_sortKey`, 500);
+    });
+
+    return Promise.all(promises);
 
   });
+
+
+  it('POST /:trailId/recordings fails with invalid data', () => {
+    return willHaveErrorResponse({
+      method: 'POST',
+      uri: '/1/recordings',
+      body: {
+        'i_am': 'an_invalid_set_of_data'
+      }
+    })
+  });
+
+  it('POST /:trailId/recordings works with valid data', () => {
+    
+    return willHaveValidResponse({
+      method: 'POST',
+      uri: '/1/recordings',
+      body: {
+        user_id: 5,
+        "date": "1234",
+        "ranking": 1,
+        "comment": "something",
+        "gpx": "<?xml version=\"1.0\"?><gpx xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"1.1\" creator=\"AllTrails.com\" xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\"><metadata><name><![CDATA[Na Pali Coast (Kalalau) Trail]]></name><desc><![CDATA[]]></desc><link href=\"http://www.alltrails.com\"><text>AllTrails, Inc.</text></link><bounds minlat=\"22.20477\" minlon=\"-159.60318\" maxlat=\"22.21898\" maxlon=\"-159.58557\"/></metadata><trk><name/><desc/><trkseg><trkpt lat=\"22.21898\" lon=\"-159.58557\"><ele>67.55</ele><time>2017-12-31T00:58:57Z</time></trkpt><trkpt lat=\"22.21894\" lon=\"-159.58559\"><ele>69.03</ele><time>2017-12-31T00:59:13Z</time></trkpt><trkpt lat=\"22.2189\" lon=\"-159.58563\"><ele>70.97</ele><time>2017-12-31T00:59:18Z</time></trkpt></trkseg></trk></gpx>"
+       }
+    })
+  });
+
+
+ 
 });

@@ -76,7 +76,7 @@ app.get('/:trailId/recordings', (req, res) => {
 
 app.post('/:trailId/recordings', (req, res) => {
   validator.validate(req.body).then((result) => {
-    res.sendJSON(result);
+    res.sendJSON([result]);
   }).catch((error) => {
     res.errorJSON(`${error}`, 400);
   });

@@ -11,6 +11,32 @@ module.exports = testUtils =  {
     const hostAndPort = `http://${process.env.HOST}:${process.env.PORT}`;
     return `${hostAndPort}${route}`;
   },
+  /**
+   * we could just recieve a url end point or a set of request options (uri + post + body etc...), so we'll resolve
+   *
+   * @param {String|Object} endpointOrOptions string or request options
+   * 
+   */
+  resolveEndpointOrOptionsValue: function(endpointOrOptions) {
+    let resultOptions;
+    if (typeof endpointOrOptions === 'string') {
+      resultOptions =  {
+        uri: testUtils.getAbsUrl(endpointOrOptions)
+      }
+    } else {
+      resultOptions = endpointOrOptions;
+      resultOptions.uri = testUtils.getAbsUrl(endpointOrOptions.uri);
+  
+    }
+
+    // extend with defaults
+    resultOptions =  Object.assign({
+      resolveWithFullResponse: true, //gets headers, body, etc
+      simple: false, // we dont want a 404 to trigger a reject
+      json: true
+    }, resultOptions);
+    return resultOptions;
+  },
 
   /**
    *
@@ -36,14 +62,12 @@ module.exports = testUtils =  {
    * @param {fn} postBaseValidation more assertions after base assertions are done
    *
    */
-  willHaveValidResponse: function(endpoint, postBaseValidation = json => {}) {
-    return requestPromise({
-      uri: testUtils.getAbsUrl(endpoint),
-      resolveWithFullResponse: true //gets headers, body, etc
-    }).then(async resp => {
+  willHaveValidResponse: function(endpointOrOptions, postBaseValidation = json => {}) {
+    if (endpointOrOptions)
+    return requestPromise(testUtils.resolveEndpointOrOptionsValue(endpointOrOptions)).then(async resp => {
       expect(resp.statusCode).toEqual(200);
-      json = await JSON.parse(resp.body);
-      expect(typeof resp.body).toEqual("string");
+      expect(typeof resp.body).toEqual("object");
+      json = resp.body;
       expect(json.data).toBeDefined();
       expect(Array.isArray(json.data)).toEqual(true);
       postBaseValidation(json);
@@ -58,18 +82,14 @@ module.exports = testUtils =  {
    * @param {fn} postBaseValidation more assertions after base assertions are don
    */
   willHaveErrorResponse: function(
-    endpoint,
+    endpointOrOptions,
     expectedStatus = 400,
     postBaseValidation = json => {}
   ) {
-    requestPromise({
-      uri: testUtils.getAbsUrl(endpoint),
-      resolveWithFullResponse: true, //gets headers, body, etc
-      simple: false // we dont want a 404 to trigger a reject
-    }).then(async resp => {
+      return requestPromise(testUtils.resolveEndpointOrOptionsValue(endpointOrOptions)).then(async resp => {
       expect(resp.statusCode).toEqual(expectedStatus);
-      expect(typeof resp.body).toEqual("string");
-      json = await JSON.parse(resp.body);
+      expect(typeof resp.body).toEqual("object");
+      json = resp.body;
       expect(json.error).toBeDefined();
       postBaseValidation(json);
       return;
