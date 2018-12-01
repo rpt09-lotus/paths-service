@@ -12,6 +12,7 @@ Paths / Routes service for 9 trails.
     - [1.5.2. Setting up the API](#152-setting-up-the-api)
     - [1.5.3. Backfilling entries via a seededRandom](#153-backfilling-entries-via-a-seededrandom)
     - [1.5.4. Validation service](#154-validation-service)
+    - [1.5.5. Unit and Integration Tests](#155-unit-and-integration-tests)
 
 ## 1.1. Related Projects
 
@@ -39,8 +40,8 @@ x for paths that we dont have on S3, backfill this data from a set of data that 
 - test suite
   - unit tests 
     - db
-    - validation
-    - aws
+    x validation
+    x aws
   x integration
     x endpoints
 
@@ -195,4 +196,18 @@ Below is a snippet of that service Dictionary.
       return aws.validateGPX(val); ///returns promise
     }
   }
+```
+
+### 1.5.5. Unit and Integration Tests
+
+Below was my strategy for developing my test suite which is stored in `test/` folder. Endpoints http:// requests test effective integration between server side services, routing, and db calls. Unit tests for each service are also tested. I used `jest` and the tests can be run by `npm test`
+
+```
+- test suite
+  - unit tests 
+    - db
+    - validation
+    - aws
+  - integration
+    - endpoints
 ```

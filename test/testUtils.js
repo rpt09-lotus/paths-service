@@ -94,5 +94,45 @@ module.exports = testUtils =  {
       postBaseValidation(json);
       return;
     });
+  },
+  /**
+   * 
+   * @param {arr} promises array of promises
+   * @returns {object} results stats/methods like {'rejectedAll', 'passed', 'total', 'results', 'createRejectionMssage()`}
+   */
+  willRejectAll: function(promises) {
+
+    // set a catcher
+    promises = promises.map((promise) => {
+      return promise.then(() => 'ok')
+      .catch((e) => {
+        return 'Error: ' + e
+      });
+    })
+
+    return Promise.all(promises).then((arr) => {
+      const amountThatPassed = arr.filter((result) => {return result === 'ok'}).length;
+     
+      // properties
+      const results = {
+        'rejectedAll':  (amountThatPassed === 0 ),
+        'passed': amountThatPassed,
+        'total': arr.length,
+        'results': arr
+      }
+
+      // methods
+      results.createRejectionMessage = (testsDescriptor) => {
+        return `\n
+        \n ${results.passed} /  ${results.total} invalid ${testsDescriptor} passed, none should pass.
+        \n
+        \n Results:
+        \n${ results.results.map((item, index) => {return `(#${index}) ${item}`}).join('\n')}
+        \n
+        \n`;
+
+      }
+      return results;
+    });
   }
 };
