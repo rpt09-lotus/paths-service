@@ -35,13 +35,14 @@ x do sorting for recordings/
 x fill 21 + 100 with backfill data since these entries dont exist
 x for paths that we dont have on S3, backfill this data from a set of data that we do have
 - Save posts to database and upload xml file to S3
+  - when implemented, for tests make sure to remove a post after
 - test suite
   - unit tests 
     - db
     - validation
     - aws
-  - integration
-    - endpoints
+  x integration
+    x endpoints
 
 ```
 
