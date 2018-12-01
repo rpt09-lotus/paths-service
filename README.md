@@ -95,13 +95,15 @@ $ (repl)> \q; #to exit repl
 # woop done!
 ```
 
-Inside `.env` place your SQL credentials (change if needed)
+Inside `.env` place your Server + SQL credentials (change if needed)
 
 ``` 
-DB_HOST=localhost
-DB_USER=root
-DB_PASS=
+HOST=localhost
 PORT=3005
+DB_HOST=localhost
+DB_PORT=3005
+DB_USER=
+DB_PASS=
 ```
 
 To test:

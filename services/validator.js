@@ -1,4 +1,3 @@
-const xml2json = require('xml2json');
 const aws = require('./aws.js');
 
 module.exports = {
