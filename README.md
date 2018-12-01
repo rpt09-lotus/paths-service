@@ -72,8 +72,14 @@ Note: that those with an asterisk *(\*)* will have more detailed information , a
 
 ## 1.4. Development Setup
 
-PostgreSQL is required. It can be installed with brew:
+This service uses the following dev stack:
 
+  - Server: node / NPM
+  - Client: react
+  - DB: PostgreSQL (installed via brew)
+  - Testing: jest
+
+If you don't have PostgreSQL,It can be installed with brew.
 
 ``` sh
 # install and start service
@@ -96,6 +102,11 @@ DB_HOST=localhost
 DB_USER=root
 DB_PASS=
 PORT=3005
+```
+
+To test:
+``` sh
+$> npm test #synonymous with jest ./test
 ```
 
 To execute:
