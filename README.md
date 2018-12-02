@@ -81,9 +81,13 @@ This service uses the following dev stack:
   - DB: PostgreSQL (installed via brew)
   - Testing: jest
 
+
 If you don't have PostgreSQL,It can be installed with brew.
 
 ``` sh
+# install npm dependencies
+$> cd /path/to/paths-service
+$> npm install
 # install and start service
 $> brew install PostgreSQL
 $>  brew services start postgresql
