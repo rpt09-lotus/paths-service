@@ -138,7 +138,7 @@ describe('endpoints tests', () => {
           // date desc
           willHaveValidResponse(`/${id}/recordings?sortBy=date,desc`, (json) => {
           expect(json.data.length).toBeGreaterThan(1);
-          const [first, last] = getFirstAndLast(json.data, 'date', (val) => {return parseInt(val)});
+          const [first, last] = getFirstAndLast(json.data, 'date', (val) => {return new Date(val).getTime()});
           // descending
           expect(first).toBeGreaterThan(last);
           return;
@@ -146,7 +146,7 @@ describe('endpoints tests', () => {
           // date asc
           willHaveValidResponse(`/${id}/recordings?sortBy=date,asc`, (json) => {
           expect(json.data.length).toBeGreaterThan(1);
-          const [first, last] = getFirstAndLast(json.data, 'date', (val) => {return parseInt(val)});
+          const [first, last] = getFirstAndLast(json.data, 'date', (val) => {return new Date(val).getTime()});
           // ascending
           expect(last).toBeGreaterThan(first);
           return;

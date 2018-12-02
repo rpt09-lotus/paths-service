@@ -53,7 +53,7 @@ module.exports = {
    * @param {Object} pathObjects path objects to format
    * @param {Array} toFormat array of keys you would like to format (must be available in mappings)
    */
-  baseFormatting: ['gpx_url', 'path_api_url'],
+  baseFormatting: ['gpx_url', 'path_api_url', 'date'],
   formatDataAll: function(pathObjects, toFormat) {
     return Promise.all(pathObjects.map((row) => {
       return this.formatData(row, toFormat);
@@ -92,6 +92,9 @@ module.exports = {
       'gpx_url': (val, obj) => {
         return awsHelper.getS3Url(val);
       }},{
+      'date': (val) => {
+        return new Date(parseInt(val)).toJSON()
+      }},{
       'gpx_data': async (val, obj) => {
         try {
           const json =  await awsHelper.readGPXByUrl( awsHelper.getS3Url(obj.gpx_url));
@@ -101,7 +104,7 @@ module.exports = {
           // we can't get all gpx data so we will backfill with a random val
           return await this.backfillNonExistentGPX(obj);
         }
-      }
+      },
     }];
     // create new object
     const willResolveFormatting = [];
