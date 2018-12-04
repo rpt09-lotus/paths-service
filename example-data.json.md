@@ -173,7 +173,7 @@ paths (with gpx valid file)
 }
 ```
 
-### 0.1.4. GET http://localhost:3005/paths/200 HTTP/1.1
+### 0.1.4. GET http://localhost:3005/paths/231 HTTP/1.1
 
 paths (with missing .gpx file, and backfilled)
 
@@ -186,48 +186,43 @@ paths (with missing .gpx file, and backfilled)
 {
   "data": [
     {
-      "id": 200,
-      "trail_id": 18,
-      "date": "2018-11-21T06:34:27.805Z",
-      "user_id": 3,
+      "id": 231,
+      "trail_id": 17,
+      "date": "2018-11-21T06:15:07.346Z",
+      "user_id": 18,
       "rating": null,
-      "comment": "10/29/18 Koko Krater Rim (Hanauma Bay) Trail",
+      "comment": "Recording - Oct 01, 01:20 PM",
       "tag": "hiking",
-      "gpx_id": 21847678,
-      "gpx_url": "https://s3.amazonaws.com/9trails-gpx/21847678.gpx",
+      "gpx_id": 21503469,
+      "gpx_url": "https://s3.amazonaws.com/9trails-gpx/21503469.gpx",
       "is_hero_path": false,
-      "have_gpx": true,
-      "path_api_url": "http://localhost:3005/paths/200",
+      "have_gpx": false,
+      "backfilled_gpx_url": "https://s3.amazonaws.com/9trails-gpx/19065986.gpx",
+      "path_api_url": "http://localhost:3005/paths/231",
       "gpx_data": {
         "bounds": {
-          "minlat": "21.2628",
-          "minlon": "-157.70267",
-          "maxlat": "21.27515",
-          "maxlon": "-157.694"
+          "minlat": "22.186",
+          "minlon": "-159.59784",
+          "maxlat": "22.22011",
+          "maxlon": "-159.58273"
         },
         "points": [
           {
-            "lat": "21.27509",
-            "lon": "-157.69512",
-            "ele": "62.09",
-            "time": "2018-10-30T00:41:02Z"
+            "lat": "22.2201",
+            "lon": "-159.58279",
+            "ele": "29.55",
+            "time": "2018-02-15T19:59:38Z"
           },
           {
-            "lat": "21.27513",
-            "lon": "-157.69521",
-            "ele": "62.39",
-            "time": "2018-10-30T00:41:13Z"
-          },
-          {
-            "lat": "21.27514",
-            "lon": "-157.69532",
-            "ele": "62.04",
-            "time": "2018-10-30T00:41:26Z"
+            "lat": "22.22008",
+            "lon": "-159.58288",
+            "ele": "30.36",
+            "time": "2018-02-15T19:59:46Z"
           }
         ]
       }
-    ]
-  }]
+    }
+  ]
 }
 ```
 

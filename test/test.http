@@ -13,7 +13,7 @@ GET http://localhost:3005/1/recordings?sortBy=rating,desc HTTP/1.1
 GET http://localhost:3005/paths/3 HTTP/1.1
 
 ### paths (with missing .gpx file, and backfilled)
-GET http://localhost:3005/paths/200 HTTP/1.1
+GET http://localhost:3005/paths/231 HTTP/1.1
 
 ### hero path
 GET http://localhost:3005/1/heroPath HTTP/1.1
