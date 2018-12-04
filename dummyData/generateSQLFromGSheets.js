@@ -30,6 +30,7 @@ const DB_TABLES = [{
       gpx_id int, 
       gpx_url text,
       is_hero_path boolean NOT NULL DEFAULT FALSE,
+      have_gpx boolean NOT NULL DEFAULT FALSE,
       PRIMARY KEY (id)
 `
 }];

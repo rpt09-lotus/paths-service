@@ -1,0 +1,133 @@
+#
+#
+# Endpoints
+#
+#
+
+### get /paths
+GET http://localhost:3005/1/paths?sortBy=id,asc HTTP/1.1
+### get /ranking
+GET http://localhost:3005/1/recordings?sortBy=rating,desc HTTP/1.1
+
+### paths (with gpx)
+GET http://localhost:3005/paths/3 HTTP/1.1
+
+### paths (with missing .gpx file, and backfilled)
+GET http://localhost:3005/paths/231 HTTP/1.1
+
+### hero path
+GET http://localhost:3005/1/heroPath HTTP/1.1
+
+
+### trailhead
+GET http://localhost:3005/1/trailHead HTTP/1.1
+
+#
+#
+# VALIDATORS
+#
+#
+
+### missing everything
+POST http://localhost:3005/3/recordings HTTP/1.1
+content-type: application/json
+
+{
+}
+
+### missing date
+POST http://localhost:3005/3/recordings HTTP/1.1
+content-type: application/json
+
+{
+    "user_id": 5
+}
+
+#### including date, but gpx missing
+
+POST http://localhost:3005/3/recordings HTTP/1.1
+content-type: application/json
+
+{ "user_id": 5, "date": "1234" }
+#### not  valid xml
+
+POST http://localhost:3005/3/recordings HTTP/1.1
+content-type: application/json
+
+{
+    "user_id": 5,
+    "date": "1234",
+    "gpx": "im not xml"
+}
+
+#### not valid gpx file, but valid xml
+
+POST http://localhost:3005/3/recordings HTTP/1.1
+content-type: application/json
+
+{
+    "user_id": 5,
+    "date": "1234",
+    "gpx": "<xml></xml>"
+}
+
+#### comment must be a string
+
+POST http://localhost:3005/3/recordings HTTP/1.1
+content-type: application/json
+
+{
+    "user_id": 5,
+    "date": "1234",
+    "comment": 3
+}
+
+#### date cant be blank brah
+
+POST http://localhost:3005/3/recordings HTTP/1.1
+content-type: application/json
+
+{
+    "user_id": 5,
+    "date": " ",
+    "comment": 3
+}
+
+#### user cannot exceed 100
+
+POST http://localhost:3005/3/recordings HTTP/1.1
+content-type: application/json
+
+{
+    "user_id": 105,
+    "date": "1234",
+    "rating": 6,
+    "gpx": "<?xml version=\"1.0\"?><gpx xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"1.1\" creator=\"AllTrails.com\" xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\"><metadata><name><![CDATA[Na Pali Coast (Kalalau) Trail]]></name><desc><![CDATA[]]></desc><link href=\"http://www.alltrails.com\"><text>AllTrails, Inc.</text></link><bounds minlat=\"22.20477\" minlon=\"-159.60318\" maxlat=\"22.21898\" maxlon=\"-159.58557\"/></metadata><trk><name/><desc/><trkseg><trkpt lat=\"22.21898\" lon=\"-159.58557\"><ele>67.55</ele><time>2017-12-31T00:58:57Z</time></trkpt><trkpt lat=\"22.21894\" lon=\"-159.58559\"><ele>69.03</ele><time>2017-12-31T00:59:13Z</time></trkpt><trkpt lat=\"22.2189\" lon=\"-159.58563\"><ele>70.97</ele><time>2017-12-31T00:59:18Z</time></trkpt></trkseg></trk></gpx>"
+}
+
+
+#### ranking not exceeding 5
+
+POST http://localhost:3005/3/recordings HTTP/1.1
+content-type: application/json
+
+{
+    "user_id": 4,
+    "date": "1234",
+    "rating": 6,
+    "gpx": "<?xml version=\"1.0\"?><gpx xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"1.1\" creator=\"AllTrails.com\" xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\"><metadata><name><![CDATA[Na Pali Coast (Kalalau) Trail]]></name><desc><![CDATA[]]></desc><link href=\"http://www.alltrails.com\"><text>AllTrails, Inc.</text></link><bounds minlat=\"22.20477\" minlon=\"-159.60318\" maxlat=\"22.21898\" maxlon=\"-159.58557\"/></metadata><trk><name/><desc/><trkseg><trkpt lat=\"22.21898\" lon=\"-159.58557\"><ele>67.55</ele><time>2017-12-31T00:58:57Z</time></trkpt><trkpt lat=\"22.21894\" lon=\"-159.58559\"><ele>69.03</ele><time>2017-12-31T00:59:13Z</time></trkpt><trkpt lat=\"22.2189\" lon=\"-159.58563\"><ele>70.97</ele><time>2017-12-31T00:59:18Z</time></trkpt></trkseg></trk></gpx>"
+}
+
+
+#### valid gpx file
+
+POST http://localhost:3005/3/recordings HTTP/1.1
+content-type: application/json
+
+{
+    "user_id": 5,
+    "date": "1234",
+    "rating": 1,
+    "comment": "something",
+    "gpx": "<?xml version=\"1.0\"?><gpx xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"1.1\" creator=\"AllTrails.com\" xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\"><metadata><name><![CDATA[Na Pali Coast (Kalalau) Trail]]></name><desc><![CDATA[]]></desc><link href=\"http://www.alltrails.com\"><text>AllTrails, Inc.</text></link><bounds minlat=\"22.20477\" minlon=\"-159.60318\" maxlat=\"22.21898\" maxlon=\"-159.58557\"/></metadata><trk><name/><desc/><trkseg><trkpt lat=\"22.21898\" lon=\"-159.58557\"><ele>67.55</ele><time>2017-12-31T00:58:57Z</time></trkpt><trkpt lat=\"22.21894\" lon=\"-159.58559\"><ele>69.03</ele><time>2017-12-31T00:59:13Z</time></trkpt><trkpt lat=\"22.2189\" lon=\"-159.58563\"><ele>70.97</ele><time>2017-12-31T00:59:18Z</time></trkpt></trkseg></trk></gpx>"
+}
