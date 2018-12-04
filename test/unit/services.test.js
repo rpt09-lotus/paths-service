@@ -67,7 +67,7 @@ describe('validator tests', () => {
         // date cannot be blank
         { "user_id": 5, "date": " ", "comment": 3 },
         // ranking cannot excceed 5
-        { "user_id": 4, "date": "1234", "ranking": 6, "gpx": validGpxData }
+        { "user_id": 4, "date": "1234", "rating": 6, "gpx": validGpxData }
       ].map( (json) => {
         // creates validator promises
         return validator.validate(json);

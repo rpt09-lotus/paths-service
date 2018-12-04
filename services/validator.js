@@ -31,7 +31,7 @@ module.exports = {
       }
     },
     {
-      name: 'ranking',
+      name: 'rating',
       type: 'number',
       errorMessage: 'is not between 0 & 5',
       validator: (val) => {

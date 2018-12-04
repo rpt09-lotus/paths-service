@@ -71,7 +71,7 @@ content-type: application/json
 {
     "user_id": 105,
     "date": "1234",
-    "ranking": 6,
+    "rating": 6,
     "gpx": "<?xml version=\"1.0\"?><gpx xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"1.1\" creator=\"AllTrails.com\" xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\"><metadata><name><![CDATA[Na Pali Coast (Kalalau) Trail]]></name><desc><![CDATA[]]></desc><link href=\"http://www.alltrails.com\"><text>AllTrails, Inc.</text></link><bounds minlat=\"22.20477\" minlon=\"-159.60318\" maxlat=\"22.21898\" maxlon=\"-159.58557\"/></metadata><trk><name/><desc/><trkseg><trkpt lat=\"22.21898\" lon=\"-159.58557\"><ele>67.55</ele><time>2017-12-31T00:58:57Z</time></trkpt><trkpt lat=\"22.21894\" lon=\"-159.58559\"><ele>69.03</ele><time>2017-12-31T00:59:13Z</time></trkpt><trkpt lat=\"22.2189\" lon=\"-159.58563\"><ele>70.97</ele><time>2017-12-31T00:59:18Z</time></trkpt></trkseg></trk></gpx>"
 }
 
@@ -84,7 +84,7 @@ content-type: application/json
 {
     "user_id": 4,
     "date": "1234",
-    "ranking": 6,
+    "rating": 6,
     "gpx": "<?xml version=\"1.0\"?><gpx xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"1.1\" creator=\"AllTrails.com\" xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\"><metadata><name><![CDATA[Na Pali Coast (Kalalau) Trail]]></name><desc><![CDATA[]]></desc><link href=\"http://www.alltrails.com\"><text>AllTrails, Inc.</text></link><bounds minlat=\"22.20477\" minlon=\"-159.60318\" maxlat=\"22.21898\" maxlon=\"-159.58557\"/></metadata><trk><name/><desc/><trkseg><trkpt lat=\"22.21898\" lon=\"-159.58557\"><ele>67.55</ele><time>2017-12-31T00:58:57Z</time></trkpt><trkpt lat=\"22.21894\" lon=\"-159.58559\"><ele>69.03</ele><time>2017-12-31T00:59:13Z</time></trkpt><trkpt lat=\"22.2189\" lon=\"-159.58563\"><ele>70.97</ele><time>2017-12-31T00:59:18Z</time></trkpt></trkseg></trk></gpx>"
 }
 
@@ -97,7 +97,7 @@ content-type: application/json
 {
     "user_id": 5,
     "date": "1234",
-    "ranking": 1,
+    "rating": 1,
     "comment": "something",
     "gpx": "<?xml version=\"1.0\"?><gpx xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"1.1\" creator=\"AllTrails.com\" xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\"><metadata><name><![CDATA[Na Pali Coast (Kalalau) Trail]]></name><desc><![CDATA[]]></desc><link href=\"http://www.alltrails.com\"><text>AllTrails, Inc.</text></link><bounds minlat=\"22.20477\" minlon=\"-159.60318\" maxlat=\"22.21898\" maxlon=\"-159.58557\"/></metadata><trk><name/><desc/><trkseg><trkpt lat=\"22.21898\" lon=\"-159.58557\"><ele>67.55</ele><time>2017-12-31T00:58:57Z</time></trkpt><trkpt lat=\"22.21894\" lon=\"-159.58559\"><ele>69.03</ele><time>2017-12-31T00:59:13Z</time></trkpt><trkpt lat=\"22.2189\" lon=\"-159.58563\"><ele>70.97</ele><time>2017-12-31T00:59:18Z</time></trkpt></trkseg></trk></gpx>"
 }
