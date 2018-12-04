@@ -1,3 +1,33 @@
+#
+#
+# Endpoints
+#
+#
+
+### get /paths
+GET http://localhost:3005/1/paths?sortBy=id,asc HTTP/1.1
+### get /ranking
+GET http://localhost:3005/1/recordings?sortBy=rating,desc HTTP/1.1
+
+### paths (with gpx)
+GET http://localhost:3005/paths/3 HTTP/1.1
+
+### paths (with missing .gpx file, and backfilled)
+GET http://localhost:3005/paths/200 HTTP/1.1
+
+### hero path
+GET http://localhost:3005/1/heroPath HTTP/1.1
+
+
+### trailhead
+GET http://localhost:3005/1/trailHead HTTP/1.1
+
+#
+#
+# VALIDATORS
+#
+#
+
 ### missing everything
 POST http://localhost:3005/3/recordings HTTP/1.1
 content-type: application/json
