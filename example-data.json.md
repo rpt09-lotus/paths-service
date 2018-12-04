@@ -1,14 +1,14 @@
 
 ## 0.1. TOC
 
-- [0.1.1. GET http://localhost:3005/1/paths HTTP/1.1](#011-get-httplocalhost30051paths-http11)
-- [0.1.2. GET http://localhost:3005/1/recordings?sortBy=rating,desc HTTP/1.1](#012-get-httplocalhost30051recordingssortbyratingdesc-http11)
-- [0.1.3. GET http://localhost:3005/paths/3 HTTP/1.1](#013-get-httplocalhost3005paths3-http11)
-- [0.1.4. GET http://localhost:3005/paths/200 HTTP/1.1](#014-get-httplocalhost3005paths200-http11)
-- [0.1.5. POST http://localhost:3005/3/recordings HTTP/1.1](#015-post-httplocalhost30053recordings-http11)
-- [0.1.6. POST http://localhost:3005/3/recordings HTTP/1.1 (error handling)](#016-post-httplocalhost30053recordings-http11-error-handling)
-- [0.1.7. GET http://localhost:3005/1/heroPath HTTP/1.1](#017-get-httplocalhost30051heropath-http11)
-- [0.1.8. GET http://localhost:3005/1/trailHead HTTP/1.1](#018-get-httplocalhost30051trailhead-http11)
+- [0.1.1. GET http://localhost:3005/:trailId/paths HTTP/1.1](#011-get-httplocalhost30051paths-http11)
+- [0.1.2. GET http://localhost:3005/:trailId/recordings?sortBy=rating,desc HTTP/1.1](#012-get-httplocalhost30051recordingssortbyratingdesc-http11)
+- [0.1.3. GET http://localhost:3005/paths/:pathId HTTP/1.1](#013-get-httplocalhost3005paths3-http11) (existing gpx)
+- [0.1.4. GET http://localhost:3005/paths/:pathId HTTP/1.1](#014-get-httplocalhost3005paths231-http11) (backfilled gpx)
+- [0.1.5. POST http://localhost:3005/:trailId/recordings HTTP/1.1](#015-post-httplocalhost30053recordings-http11) (valid post)
+- [0.1.6. POST http://localhost:3005/:trailId/recordings HTTP/1.1](#016-post-httplocalhost30053recordings-http11-error-handling) (error handling)
+- [0.1.7. GET http://localhost:3005/:trailId/heroPath HTTP/1.1](#017-get-httplocalhost30051heropath-http11)
+- [0.1.8. GET http://localhost:3005/:trailId/trailHead HTTP/1.1](#018-get-httplocalhost30051trailhead-http11)
 
 ### 0.1.1. GET http://localhost:3005/1/paths HTTP/1.1
 
