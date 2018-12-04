@@ -22,28 +22,68 @@ module.exports = {
   },
   /**
    * 
+   * Valid sort options and formatters
+   * 
+   */
+  VALID_SORT_OPTIONS:  {
+    ascOrDesc: ['asc', 'desc'],
+    sortBy: [
+      'id', 
+      'rating', 
+      {
+      'name': 'date',
+      'format': (val) => {
+        // optional pre sort formatter
+        return new Date(val).getTime();
+      }
+    }],
+  },
+  /**
+   * 
    * @param {string} sortBy column to sort by
    * @param {string} ascOrDesc asc or desc string
    */
   validateSortOptions: function(sortBy, ascOrDesc) {
-    const VALID_SORT_OPTIONS =  {
-      ascOrDesc: ['asc', 'desc'],
-      sortBy: ['id', 'rating', 'date'],
-    };
+    const VALID_SORT_KEYS =  this.VALID_SORT_OPTIONS.sortBy.map((item) => {
+      // get keys to determine validity
+      return (typeof item === 'object') ? item.name : item;
+    })
     return (
-        VALID_SORT_OPTIONS.sortBy.indexOf(sortBy.toLowerCase()) !== -1 &&
-        VALID_SORT_OPTIONS.ascOrDesc.indexOf(ascOrDesc.toLowerCase()) !== -1
+        VALID_SORT_KEYS.indexOf(sortBy.toLowerCase()) !== -1 &&
+        this.VALID_SORT_OPTIONS.ascOrDesc.indexOf(ascOrDesc.toLowerCase()) !== -1
     );
   },
   generateOrderString: function(sortBy, ascOrDesc) {
     return `${sortBy} ${ascOrDesc}`;
   },
+  /**
+   * 
+   * @param {string} sortBy name of sort key
+   * @returns {fn} function that formats value for sorting
+   * 
+   */
+  sortFormatterFactory: function(sortBy) {
+    // create a formatter function 
+    let formatterFunc = (val) => {return val};
+    let key, currFormatter;
+    this.VALID_SORT_OPTIONS.sortBy.forEach((item) => {
+      // get keys to determine sort formatter
+      key = (typeof item === 'object') ? item.name : item;
+      // strore format func
+      currFormatter = (typeof item === 'object') ? item.format : (val) => {return val};
+      if (key.trim().toLowerCase() === sortBy.trim().toLowerCase()) {
+        formatterFunc = currFormatter;
+      }
+    });
+    return formatterFunc;
+  },
   sortBy: function([...arr], sortBy, ascOrDesc) {
+    const formatForSorting = this.sortFormatterFactory(sortBy);
     arr.sort((a, b) => {
       if (ascOrDesc.toLowerCase() === 'asc') {
-        return a[sortBy] - b[sortBy];
+        return formatForSorting(a[sortBy]) - formatForSorting(b[sortBy]);
       } else {
-        return b[sortBy] - a[sortBy];
+        return formatForSorting(b[sortBy]) - formatForSorting(a[sortBy]);
       }
     })
     return arr;
