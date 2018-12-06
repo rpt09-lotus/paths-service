@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = 3005;
 
+app.use('/', express.static(__dirname + '/../client/'));
 app.use(bodyParser.json());
 app.use((req, res, next) => {
 
@@ -20,19 +21,20 @@ app.use((req, res, next) => {
       sortBy.ascOrDesc = ascOrDesc || sortBy.ascOrDesc;
     }
     return sortBy;
-  }
+  };
 
   req.sortBy = getSortByObject();
 
   db.host = req.protocol + '://' + req.headers.host;
   res.sendJSON = (data) => {
-    res.status(200).end(JSON.stringify({data}))
-  }
-  res.errorJSON = (error, status=400) => {
-    res.status(status).end(JSON.stringify({error}))
-  }
+    res.status(200).end(JSON.stringify({data}));
+  };
+  res.errorJSON = (error, status = 400) => {
+    res.status(status).end(JSON.stringify({error}));
+  };
   next();
 });
+
 
 app.get('/paths', (req, res) => {
   db.getAll().then((result) => {
@@ -80,7 +82,7 @@ app.post('/:trailId/recordings', (req, res) => {
   }).catch((error) => {
     res.errorJSON(`${error}`, 400);
   });
-})
+});
 
 app.get('/:trailId/heroPath',(req, res) => {
   db.getHeroPathByTrailId(req.params.trailId).then((result) => {
@@ -88,7 +90,7 @@ app.get('/:trailId/heroPath',(req, res) => {
   }).catch((error) => {
     res.errorJSON(`${error}`, 500);
   });
-})
+});
 
 app.get('/:trailId/trailHead', (req, res) => {
   db.getTrailHeadById(req.params.trailId).then((result) => {
@@ -96,11 +98,11 @@ app.get('/:trailId/trailHead', (req, res) => {
   }).catch((error) => {
     res.errorJSON(`${error}`, 500);
   });
-})
+});
 
 app.get('*', (req, res) => {
   res.errorJSON(`${req.url} Not found`, 404);
-})
+});
 
 
 app.listen(PORT, () => {
