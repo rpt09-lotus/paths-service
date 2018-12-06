@@ -1,11 +1,12 @@
-# 1. Paths Service
+# Paths Service
 
 Paths / Routes service for 9 trails.
-  
+
   - [1.1. Related Projects](#11-related-projects)
   - [1.2. To do](#12-to-do)
   - [1.3. Usage](#13-usage)
     - [1.3.1. API endpoints](#131-api-endpoints)
+    - [1.3.2. Individual Component Page](#132-individual-component-page)
   - [1.4. Development Setup](#14-development-setup)
   - [1.5. Log](#15-log)
     - [1.5.1. Seeding the database](#151-seeding-the-database)
@@ -13,6 +14,8 @@ Paths / Routes service for 9 trails.
     - [1.5.3. Backfilling entries via a seededRandom](#153-backfilling-entries-via-a-seededrandom)
     - [1.5.4. Validation service](#154-validation-service)
     - [1.5.5. Unit and Integration Tests](#155-unit-and-integration-tests)
+    - [1.5.6. Page Layout Scaffolding + Service Launcher](#156-page-layout-scaffolding--service-launcher)
+    - [1.5.7 React basic setup](#157-react-basic-setup)
 
 ## 1.1. Related Projects
 
@@ -25,25 +28,15 @@ Paths / Routes service for 9 trails.
 ## 1.2. To do
 
 ```
-x Setup database 
-x Setup Server
-x serve routes
-  x base routes
-  x POST {trailId}/path
-x do sorting for recordings/
-  x GET {trailId}/recordings?sortBy=date,{asc|desc}
-  x GET {trailId}/recordings?sortBy=ranking,{asc|desc}
-x fill 21 + 100 with backfill data since these entries dont exist
-x for paths that we dont have on S3, backfill this data from a set of data that we do have
+- Phase 02
+  x Setup react env
+  - Setup proxy server
+  - Have data change based on route
+  - how will scaffold get id ?
+  - Render basic map widget
+  - render basic recording widget
 - Save posts to database and upload xml file to S3
   - when implemented, for tests make sure to remove a post after
-x test suite
-  x unit tests 
-    x db
-    x validation
-    x aws
-  x integration
-    x endpoints
 
 ```
 
@@ -71,6 +64,10 @@ Note: that those with an asterisk *(\*)* will have more detailed information , a
     - retrieves detailed information about the canonical path for a given trail data. this also will retrieve gpx data.
   - GET `/:trailId/trailHead` * 
     - retrieves first point of the canonical path for a given trail from the database if available.
+
+### 1.3.2. Individual Component Page
+
+Going to `GET /` aka the root server page, will render the individual components. This is useful for testing.
 
 ## 1.4. Development Setup
 
@@ -120,6 +117,14 @@ $> npm test #synonymous with jest ./test
 To execute:
 ``` sh
 $> npm run server-dev #should be running on 3005
+```
+
+To build in react:
+``` sh
+# build once (builds to dist/)
+$> npm run build 
+# or for watching file changes
+$> npm run buildWatch
 ```
 
 ## 1.5. Log
@@ -215,3 +220,16 @@ Below was my strategy for developing my test suite which is stored in `test/` fo
   - integration
     - endpoints
 ```
+
+### 1.5.6. Page Layout Scaffolding + Service Launcher
+
+Switching gears in phase 02, was time to think about page layout for all our individual services component. I layed out a rough draft in [Figma](http://figma.com/file/CShpO1gQJP6MDReqEmgaZN/9-Trails?node-id=0%3A1) as a starting point and then using Jeff's layout.html from our [proxy-reference-files repo](https://github.com/rpt09-scully/proxy-reference-files), I created the [MVP of our scaffold](https://github.com/rpt09-scully/proxy-reference-files/tree/master/shared/layout.html) in the shared directory. THis will likely be improved but works as a base for inserting our individual components.
+
+In tandem, i also created a [shell script](https://github.com/rpt09-scully/proxy-reference-files/tree/master/shared/launch) to launch all services based on a `launchDirs.txt` file. This file is line seperated `[path/to/service] > npm run [scriptName]` which tells the shell script which directorys should be cd'd into and server started. All of these processes get thrown into a console in their seperate tab! So this manual process of launching 5 services and a proxy is now skipped with this tool.
+
+
+### 1.5.7. React basic setup
+
+I setup my basic react setup. Beacuase I have two widgets I have namespaced them accordingly both in the DOM and React as `NTPathService.CanonicalPath` and `NTPathService.Recordings` for react components and `9Trails.PathService.CanonicalPath` and `9Trails.PathService.Recordings` for dom ids. 
+
+I setup webpack serving from the dist/ folder on port 3000. THis runs a standalone version of just my components for now for quick testing. I will do the proxy server next.
