@@ -1,5 +1,4 @@
-import React from 'react';
-
+import style from '../scss/style.scss';
 
 export class CanonicalPath extends React.Component {
 
@@ -11,7 +10,7 @@ export class CanonicalPath extends React.Component {
     return (
       <div>
         <h1>Canonical Path Widget</h1>
-        <p>This will be the main path widget of the page</p>
+        <p className={style.test}>This will <span className={style.red}>be</span> the main path widget of the page</p>
       </div>
     );
   }
