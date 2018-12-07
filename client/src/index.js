@@ -1,4 +1,6 @@
-import * as NTPathsService from './components/App.js';
+import app from './components/App.js';
 
-ReactDOM.render(<NTPathsService.CanonicalPath/>, document.getElementById('9Trails.PathsService.CanonicalPath'));
-ReactDOM.render(<NTPathsService.Recordings/>, document.getElementById('9Trails.PathsService.Recordings'));
+window.onload = () => {
+  ReactDOM.render(React.createElement(NT.PathsService.CanonicalPath), document.getElementById('9Trails.PathsService.CanonicalPath'));
+  ReactDOM.render(React.createElement(NT.PathsService.Recordings), document.getElementById('9Trails.PathsService.Recordings'));
+};
