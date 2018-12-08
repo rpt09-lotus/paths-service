@@ -1,5 +1,6 @@
 const { Client } = require('pg');
 const awsHelper = require('../services/aws.js');
+const dotenv = require('dotenv').config();
 
 const client = new Client({
   database: '9trails-paths',

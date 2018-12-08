@@ -79,13 +79,13 @@ This service uses the following dev stack:
   - Testing: jest
 
 
-If you don't have PostgreSQL,It can be installed with brew.
+If you don't have PostgreSQL,It can be installed with brew. If you choose not to use brew or are using linux , please see this [article](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-18-04) on postgres installation
 
 ``` sh
 # install npm dependencies
 $> cd /path/to/paths-service
 $> npm install
-# install and start service
+# install and start service (if no brew, see above note!)
 $> brew install PostgreSQL
 $>  brew services start postgresql
 # create the db with `createdb` command
