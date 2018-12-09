@@ -3,12 +3,14 @@ const db = require('../db/db.js');
 const validator = require('../services/validator.js');
 const bodyParser = require('body-parser');
 const app = express();
+const path = require('path');
 const PORT = 3005;
 
 app.use('/', express.static(__dirname + '/../client/'));
 app.use(bodyParser.json());
 app.use((req, res, next) => {
 
+  console.log(`Incoming Request: ${req.method} ${req.url} `);
   const getSortByObject = () => { 
     const sortBy = {
       column: 'id',
@@ -35,6 +37,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/app.js', (req, res) => {
+  console.log(__dirname + '/../client/dist/assets/app.bundle.js');
+  res.status(200).sendFile(path.resolve(__dirname + '/../client/dist/assets/app.bundle.js'));
+});
 
 app.get('/paths', (req, res) => {
   db.getAll().then((result) => {

@@ -1,4 +1,4 @@
-# Paths Service
+# 1. Paths Service
 
 Paths / Routes service for 9 trails.
 
@@ -16,6 +16,7 @@ Paths / Routes service for 9 trails.
     - [1.5.5. Unit and Integration Tests](#155-unit-and-integration-tests)
     - [1.5.6. Page Layout Scaffolding + Service Launcher](#156-page-layout-scaffolding--service-launcher)
     - [1.5.7 React basic setup](#157-react-basic-setup)
+    - [1.5.8. Proxy service launcher + inserting into it DOM](#158-proxy-service-launcher--inserting-into-it-dom)
 
 ## 1.1. Related Projects
 
@@ -30,11 +31,15 @@ Paths / Routes service for 9 trails.
 ```
 - Phase 02
   x Setup react env
-  - Setup proxy server
+  x Setup proxy server 
+  x load my service and insert into dom
+  - load all other services and have insert into dom
+
   - Have data change based on route
-  - how will scaffold get id ?
+    - how will scaffold get id ?
   - Render basic map widget
   - render basic recording widget
+
 - Save posts to database and upload xml file to S3
   - when implemented, for tests make sure to remove a post after
 
@@ -233,3 +238,36 @@ In tandem, i also created a [shell script](https://github.com/rpt09-scully/proxy
 I setup my basic react setup. Beacuase I have two widgets I have namespaced them accordingly both in the DOM and React as `NTPathService.CanonicalPath` and `NTPathService.Recordings` for react components and `9Trails.PathService.CanonicalPath` and `9Trails.PathService.Recordings` for dom ids. 
 
 I setup webpack serving from the dist/ folder on port 3000. THis runs a standalone version of just my components for now for quick testing. I will do the proxy server next.
+
+
+### 1.5.8. Proxy service launcher + inserting into it DOM
+
+I setup my [proxy service here](https://github.com/rpt09-scully/chris-proxy-service) which can be cloned to your parent FEC folder. TO launch this and all my services, I use the [Service Launcher tool](https://github.com/rpt09-scully/proxy-reference-files/tree/master/shared/launch) I made. It will automatically startup all the services proxy. Because we're using a pretty straightfoward name space the code below, will automatically check the namespace and insert it into the appropriate DOM Ids. This code was inserted into our shared layout folder [https://github.com/rpt09-scully/proxy-reference-files/tree/master/shared](here): 
+
+``` js
+    // if properly namespaced the DOM insertion is automated!
+    Object.keys(window.NT).forEach((serviceKey) => {
+      // now get service object
+      Object.keys(window.NT[serviceKey]).forEach((widgetKey) => {
+        const dom_id = `9Trails.${serviceKey}.${widgetKey}`;
+        const currentWidget = window.NT[serviceKey][widgetKey];
+        ReactDOM.render(React.createElement(currentWidget), document.getElementById(dom_id));
+      });
+    });
+```
+
+I also have created **two** useful scripts in my main parent directory:
+  - (1) copying this layout from the reference-files we have directly into my personal proxy. (THis is useful to just have one source of truth which we can share, but then copy into our indiv proxy repos)
+  - (2) launching service launcher (see previous link for more info) from reference-files repo 
+
+It looks like this
+
+``` js
+// package.json excerpt from parent fec directory
+{
+  "scripts": {
+    "copyScaffold": "cp -rf ./proxy-reference-files/shared/. ./chris-proxy-service/public && rm -rf ./chris-proxy-service/public/launch",
+    "launchServices": "killall Terminal & killall -9 node & ./proxy-reference-files/shared/launch/launch.sh"
+  }
+}
+```
