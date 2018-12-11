@@ -1,7 +1,11 @@
-import React from 'react';
+import style from '../scss/style.scss';
+import {createNameSpace} from '../services/utils.js';
 
+// create namespaced object for storing my react elements
+const ns = createNameSpace('NT.PathsService');
 
-export class CanonicalPath extends React.Component {
+// canonical path react widget
+ns.CanonicalPath = class CanonicalPath extends React.Component {
 
   constructor(props) {
     super(props);
@@ -11,14 +15,15 @@ export class CanonicalPath extends React.Component {
     return (
       <div>
         <h1>Canonical Path Widget</h1>
-        <p>This will be the main path widget of the page</p>
+        <p className={style.test}>This will <span className={style.red}>be</span> the main path widget of the page</p>
       </div>
     );
   }
     
-}
+};
 
-export class Recordings extends React.Component {
+// recording widget
+ns.Recordings = class Recordings extends React.Component {
 
   constructor(props) {
     super(props);
@@ -32,5 +37,6 @@ export class Recordings extends React.Component {
       </div>
     );
   }
-    
-}
+};
+
+
