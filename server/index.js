@@ -3,10 +3,12 @@ const db = require('../db/db.js');
 const validator = require('../services/validator.js');
 const bodyParser = require('body-parser');
 const app = express();
+const cors = require('cors');
 const path = require('path');
 const PORT = 3005;
 
 app.use('/', express.static(__dirname + '/../client/'));
+app.use(cors());
 app.use(bodyParser.json());
 app.use((req, res, next) => {
 
