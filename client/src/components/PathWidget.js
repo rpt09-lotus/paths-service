@@ -1,5 +1,5 @@
 // ES6
-import ReactMapboxGl, { GeoJSONLayer } from 'react-mapbox-gl';
+import ReactMapboxGl, { GeoJSONLayer, Marker } from 'react-mapbox-gl';
 
 const geoJSON = {
   'type': 'FeatureCollection',
@@ -15,14 +15,28 @@ const geoJSON = {
   ]
 };
 
+var geoJSONPt = {
+  "type": "FeatureCollection",
+  "features": [{
+      "type": "Feature",
+      "geometry": {
+          "type": "Point",
+          "coordinates": [0, 0]
+      }
+  }]
+};
+
+
 export default class PathWidget extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       geoJSON: null,
       bounds: null,
+      geoJSONPt: [],
       loading: true
     };
+    this.onMapHover = this.onMapHover.bind(this);
   }
 
   componentDidMount() {
@@ -56,15 +70,61 @@ export default class PathWidget extends React.Component {
       });
   }
 
+  onDataLoading(map, e) {
+    console.log('weee');
+
+  }
+
+  onMapHover(map, e) {
+    if (!map.getSource('point')) {
+      map.addSource('point', {
+        "type": "geojson",
+        "data": geoJSONPt
+      });
+      map.addLayer({
+        "id": "hover_pt",
+        "type": "circle",
+        afterLayerId: 'geojson-1-line',
+        "source": "point",
+        "paint": {
+          'circle-radius': 30,
+          'circle-opacity': 0.5,
+          'circle-color': '#ff0000'
+        }
+      });
+      
+    }
+    map.moveLayer('geojson-1-line', 'hover_pt');
+    const lnglat = e.lngLat;
+    const tol = 4;
+    const geoJSONFeatures = map.queryRenderedFeatures([[e.point.x - tol, e.point.y - tol],[e.point.x + tol, e.point.y + tol]]).filter((feature) => {
+    
+      return (feature.source.toLowerCase().indexOf('geojson') !== -1);
+    });
+    if (geoJSONFeatures.length) {
+      const geoJSONFeature = geoJSONFeatures[0];
+      console.log(geoJSONFeature);
+      geoJSONPt.features[0].geometry.coordinates = [lnglat.lng, lnglat.lat];
+      map.getSource('point').setData(geoJSONPt);
+      console.log(geoJSONFeature, ' selected!', lnglat);
+    } else {
+      geoJSONPt.features[0].geometry.coordinates = [];
+      map.getSource('point').setData(geoJSONPt);
+    }
+  }
+  
   render() {
     const Map = ReactMapboxGl({
       accessToken:
         'pk.eyJ1IjoiY2ptNzcxIiwiYSI6ImNqOG92Z3YyYjA5Y3EzMnBjZTdoZnN0a3YifQ.7ff2wUzKItFMviEA60OcFA',
       attributionControl: false
     });
+
     return (this.state.loading) ? (<div className='loading'></div>) : (
       <Map
         style="mapbox://styles/cjm771/cjpjymsoc0nsz2slnpyrkxdol"
+        onMouseMove={this.onMapHover}
+        onDataLoading={this.onDataLoading}
         fitBounds={this.state.bounds}
         fitBoundsOptions={{padding: 50}}
         containerStyle={{
