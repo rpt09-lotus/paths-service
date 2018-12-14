@@ -67,7 +67,7 @@ module.exports = testUtils =  {
     return requestPromise(testUtils.resolveEndpointOrOptionsValue(endpointOrOptions)).then(async resp => {
       expect(resp.statusCode).toEqual(200);
       expect(typeof resp.body).toEqual("object");
-      json = resp.body;
+      const json = resp.body;
       expect(json.data).toBeDefined();
       expect(Array.isArray(json.data)).toEqual(true);
       postBaseValidation(json);
@@ -89,7 +89,7 @@ module.exports = testUtils =  {
       return requestPromise(testUtils.resolveEndpointOrOptionsValue(endpointOrOptions)).then(async resp => {
       expect(resp.statusCode).toEqual(expectedStatus);
       expect(typeof resp.body).toEqual("object");
-      json = resp.body;
+      const json = resp.body;
       expect(json.error).toBeDefined();
       postBaseValidation(json);
       return;
