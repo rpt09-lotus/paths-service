@@ -151,7 +151,6 @@ describe("endpoints tests", () => {
           const [first, last] = getFirstAndLast(json.data, "date", val => {
             return new Date(val).getTime();
           });
-          console.log(first, last);
           // descending
           expect(first).toBeGreaterThan(last);
           return;
