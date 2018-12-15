@@ -16,7 +16,6 @@ module.exports = {
   },
   getTrailIdFromUrl: () => {
     const trailId = parseInt(location.href.split('/').pop()) || 1;
-    debugger;
     return trailId;
   }
 };
