@@ -1,5 +1,7 @@
 import style from '../scss/style.scss';
 import {createNameSpace} from '../services/utils.js';
+import PathWidget from '../components/PathWidget';
+import RecordingsList from './RecordingsList';
 
 // create namespaced object for storing my react elements
 const ns = createNameSpace('NT.PathsService');
@@ -8,14 +10,15 @@ const ns = createNameSpace('NT.PathsService');
 ns.CanonicalPath = class CanonicalPath extends React.Component {
 
   constructor(props) {
-    super(props);
+    super();
   }
 
   render() {
     return (
-      <div>
+      <div className='col-12'>
         <h1>Canonical Path Widget</h1>
         <p className={style.test}>This will <span className={style.red}>be</span> the main path widget of the page</p>
+        <PathWidget trailId={1} />
       </div>
     );
   }
@@ -33,7 +36,7 @@ ns.Recordings = class Recordings extends React.Component {
     return (
       <div>
         <h1>Recordings Widget</h1>
-        <p>This is the recording widget of the page</p>
+        <RecordingsList trailId={1} />
       </div>
     );
   }

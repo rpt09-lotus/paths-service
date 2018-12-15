@@ -3,12 +3,26 @@
 <head>
   <meta charset="utf-8">
   <title>Single Module - Paths Service Testing</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" 
+  integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+  crossorigin="anonymous">
+  <style>
+  body, html {
+    background: #c0c0c0;
+  }
+  .container {
+    background: #fff;
+    padding: 4rem;
+  }
+  </style>
 </head>
 <body>
   <!-- entry div for react (could be anything) -->
-  <div id='9Trails.PathsService.CanonicalPath'>
-  </div>
-  <div id='9Trails.PathsService.Recordings'>
+  <div class='container'>
+    <div id='9Trails.PathsService.CanonicalPath'>
+    </div>
+    <div id='9Trails.PathsService.Recordings'>
+    </div>
   </div>
   <!-- remember our public path resolves to assets and we're deploying from dist/ -->
   <script type='text/javascript' src='dist/lib/react.development.js'></script>
