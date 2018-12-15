@@ -13,5 +13,10 @@ module.exports = {
       currValue = currValue[piece];
     }
     return currValue;
+  },
+  getTrailIdFromUrl: () => {
+    const trailId = parseInt(location.href.split('/').pop()) || 1;
+    debugger;
+    return trailId;
   }
 };

@@ -11,7 +11,7 @@ export default class RecordingsList extends React.Component {
   }
 
   componentDidMount() {
-    fetch(`http://localhost:3005/${this.props.trailId}/recordings?sortBy=date,desc`)
+    fetch(`${this.props.serviceHosts.paths}/${this.props.trailId}/recordings?sortBy=date,desc`)
       .then(response => {
         return response.json();
       })
