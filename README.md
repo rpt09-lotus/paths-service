@@ -17,6 +17,7 @@ Paths / Routes service for 9 trails.
     - [1.5.6. Page Layout Scaffolding + Service Launcher](#156-page-layout-scaffolding--service-launcher)
     - [1.5.7 React basic setup](#157-react-basic-setup)
     - [1.5.8. Proxy service launcher + inserting into it DOM](#158-proxy-service-launcher--inserting-into-it-dom)
+    - [1.5.9. Dynamic routing](#159-dynamic-routing)
 
 ## 1.1. Related Projects
 
@@ -271,3 +272,32 @@ It looks like this
   }
 }
 ```
+
+
+### 1.5.9. Dynamic routing 
+For our proxy routes to differeny trails we chose to do 
+
+``` 
+localhost/:trailId
+```
+
+One thing that was pseudo tricky was serving the root html page on dynamic routes for my proxy/dev client pages. It turns out you can specify an optional regex in the following fashion where insiide the parens basically says 'match 1-n number of digits at the end of the route'. the `*?` marks this `/:trailId` route as optional and will render the 1st trail id by default aka going to `localhost:3000`.
+
+``` js
+// matches: /, /1, /1234,
+// doesnt match: /something, /1/something, /1.text, /1.file
+/:trailId(\\d+$)*?
+```
+
+ON client I created a new util to parse this route assuming this simple route (NOTE: this is super simple parsing, but might need to be adjusted if we add # or ? url params, needs more tests).
+
+``` js
+const utils = {
+  getTrailIdFromUrl: () => {
+    const trailId = parseInt(location.href.split('/').pop()) || 1;
+    return trailId;
+  }
+}
+```
+
+I also will need to handle invalid trail ids in the react components, allthough in real env, our server would reject with 404.

@@ -39,11 +39,27 @@ app.use((req, res, next) => {
   next();
 });
 
+/****************
+ *  DEV TESTING
+ ****************/
+
+//  we also want to serve the first id as default page , synonymous with /1
+//  we want to serve any number based subroute ex. /1 , /100
+app.get('/:trailId(\\d+$)*?', (req, res) => {
+  res.status(200).sendFile(path.resolve(__dirname + '/../client/index.html'));
+});
+
+/************
+ *  ASSETS
+ ***********/
+
 app.get('/app.js', (req, res) => {
-  console.log(__dirname + '/../client/dist/assets/app.bundle.js');
   res.status(200).sendFile(path.resolve(__dirname + '/../client/dist/assets/app.bundle.js'));
 });
 
+/************
+ *  API
+ ***********/
 app.get('/paths', (req, res) => {
   db.getAll().then((result) => {
     res.sendJSON(result);

@@ -6,7 +6,7 @@ const Recording = ({recording}) => {
       <div className='col-2'>{recording.user_id}</div>
       <div className='col-8'>{recording.comment}</div>
     </div>
-  )
-}
+  );
+};
 
 export default Recording;
