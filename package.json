@@ -12,7 +12,13 @@
     "seed-database": "psql 9trails-paths < db/schema.sql",
     "test": "jest ./test/",
     "build": "webpack -d --config ./webpack.config.js --mode production",
-    "buildWatch": "webpack -d --watch --config ./webpack.config.js --mode development"
+    "buildWatch": "webpack -d --watch --config ./webpack.config.js --mode development",
+    "deploy": "scp -i \"~/.ssh/mine2.pem\" .env.production  ec2-user@ec2-54-172-80-40.compute-1.amazonaws.com:/home/ec2-user/app/.env && rsync --include .git --exclude-from=\"$(git -C . ls-files --exclude-standard -oi --directory >.git/ignores.tmp && echo .git/ignores.tmp)\" -rave \"ssh -i ~/.ssh/mine2.pem\" . ec2-user@ec2-54-172-80-40.compute-1.amazonaws.com:/home/ec2-user/app",
+    "dockerPrune": "docker system prune",
+    "dockerStop": "docker rm $(docker stop $(docker ps -a -q --filter ancestor=9trails-paths --format=\"{{.ID}}\"))",
+    "dockerBuild": "docker build --rm -t 9trails-paths .",
+    "dockerRun": "docker run -p 80:80 9trails-paths",
+    "dbr": "npm run dockerBuild && npm run dockerRun"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
@@ -24,6 +30,8 @@
     "react": "~16.5.2",
     "react-dom": "~16.5.2",
     "react-mapbox-gl": "~3.9.2",
+    "request-promise": "^4.2.2",
+    "request": "^2.88.0",
     "xml2json": "^0.11.2"
   },
   "devDependencies": {
@@ -38,8 +46,6 @@
     "jest": "^23.6.0",
     "node-sass": "^4.10.0",
     "nodemon": "^1.18.6",
-    "request": "^2.88.0",
-    "request-promise": "^4.2.2",
     "sass-loader": "^7.1.0",
     "style-loader": "^0.23.1",
     "webpack": "^4.27.1",
