@@ -6,14 +6,26 @@ import RecordingsList from './RecordingsList';
 // create namespaced object for storing my react elements
 const ns = createNameSpace('NT.PathsService');
 
-// TODO: this should be probably in a config file dynamically loaded 
-const SERVICE_HOSTS = {
-  trails: 'http://localhost:3001',
-  profile: 'http://localhost:3002',
-  trails: 'http://localhost:3003',
-  reviews: 'http://localhost:3004',
-  paths: 'http://localhost:3005',
-};
+let SERVICE_HOSTS = {};
+
+if (process.env.NODE_ENV === 'production') {
+  SERVICE_HOSTS = {
+    trails: '',
+    profile: '',
+    photos: 'http://trail-photos-service-dev.us-west-1.elasticbeanstalk.com',
+    reviews: '',
+    paths: 'http://ec2-54-172-80-40.compute-1.amazonaws.com',
+  };
+} else {
+  SERVICE_HOSTS = {
+    trails: 'http://localhost:3001',
+    profile: 'http://localhost:3002',
+    photos: 'http://localhost:3003',
+    reviews: 'http://localhost:3004',
+    paths: 'http://localhost:3005',
+  };
+}
+
 
 // canonical path react widget
 ns.CanonicalPath = class CanonicalPath extends React.Component {
