@@ -344,11 +344,11 @@ Below you can see what they look like:
 
 TO know which host urls to use (`development` or `production`) the first thing we need to do is specify this in an *Environment Variable*. in node these can be accessed via the  `process.env` object.
 
-To get this working was that for both the proxy and service we needed to set the `process.env.NODE_ENV` variable to `production`. For the service react app this was done already by using the `--mode production` flag in the webpack build process. For the proxy / server side, this was set in the Dockerfile image via `ENV NODE_ENV=production`! Then we need to check it.
+To get this working was that for both the proxy and service we needed to set the `process.env.NODE_ENV` variable to `production`. For the service react app this was done already by using the `--mode production` flag in the webpack build process. For the proxy / server side, this was set in the Dockerfile image via `ENV NODE_ENV=production`!
 
-Next, we need to check it. here are the excerpts ..
+Next, we need to check it in these two areas (service client / proxy server). here are the excerpts ..
 
-**app.js** (react app)
+**app.js** (service client / react app)
 
 ``` js
 
