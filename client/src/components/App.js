@@ -10,10 +10,10 @@ let SERVICE_HOSTS = {};
 
 if (process.env.NODE_ENV === 'production') {
   SERVICE_HOSTS = {
-    trails: '',
+    trails: 'http://trail-env.8jhbbn2nrv.us-west-2.elasticbeanstalk.com/',
     profile: '',
     photos: 'http://trail-photos-service-dev.us-west-1.elasticbeanstalk.com',
-    reviews: '',
+    reviews: 'http://trail-photos-service-dev.us-west-1.elasticbeanstalk.com',
     paths: 'http://ec2-54-172-80-40.compute-1.amazonaws.com',
   };
 } else {

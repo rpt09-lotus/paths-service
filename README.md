@@ -1,8 +1,5 @@
 # 1. Paths Service
 
-Paths / Routes service for 9 trails.
-
-  - [1.1. Related Projects](#11-related-projects)
   - [1.2. To do](#12-to-do)
   - [1.3. Usage](#13-usage)
     - [1.3.1. API endpoints](#131-api-endpoints)
@@ -18,6 +15,8 @@ Paths / Routes service for 9 trails.
     - [1.5.7 React basic setup](#157-react-basic-setup)
     - [1.5.8. Proxy service launcher + inserting into it DOM](#158-proxy-service-launcher--inserting-into-it-dom)
     - [1.5.9. Dynamic routing](#159-dynamic-routing)
+    - [1.5.10. Docker and Deployment](#1510-docker-and-deployment)
+    - [1.5.11. NODE_ENV environment variable](#1511-node_env-environment-variable)
 
 ## 1.1. Related Projects
 
@@ -301,3 +300,109 @@ const utils = {
 ```
 
 I also will need to handle invalid trail ids in the react components, allthough in real env, our server would reject with 404.
+
+### 1.5.10. Docker and Deployment
+
+For deployment I decided to use EC2/Docker which is covered in great detail via my notes here: [Docker / EC2 Notes](https://github.com/rpt09-studyhall/notesWiki/blob/master/Docker_EC2_README.md#create-local-dockerfile-and-sample-app)
+
+In regards to this repo, I created a few handy npm scripts which I can run both locally and on my ec2 instance for managing docker. 
+
+Note: To get node/npm installed on my ec2 centOs, I had to the following.
+
+``` sh
+# Add node.js yum repository
+$> sudo yum install -y gcc-c++ make
+$> sudo curl -sL https://rpm.nodesource.com/setup_6.x | sudo -E bash - 
+# install
+$> yum install nodejs
+```
+
+Then once doing that I made the following convenience `npm` scripts
+
+  - `connect` - connects via ssh to ec2.
+  - `deploy` - deploys via rsync and ssh to ec2. looks at .gitignore and tracked files to know what to exclude / include!
+  - `dockerPrune` - clean up loose containers if any
+  - `dockerStop` - kills a running container (does lookup by image name), if any
+  - `dockerBuild` - builds a d docker image
+  - `dockerRun ` - runs a docker image, creating a new container instance
+
+Below you can see what they look like:
+
+**package.json** (excerpt)
+
+``` json
+{
+    "connect": "ssh -i ~/.ssh/mine2.pem  ec2-user@ec2-3-84-218-221.compute-1.amazonaws.com",
+    "deploy": "rsync --include .git --exclude-from=\"$(git -C . ls-files --exclude-standard -oi --directory >.git/ignores.tmp && echo .git/ignores.tmp)\" -rave \"ssh -i ~/.ssh/mine2.pem\" . ec2-user@ec2-3-84-218-221.compute-1.amazonaws.com:/home/ec2-user/app",
+    "dockerPrune": "docker system prune",
+    "dockerStop": "docker rm $(docker stop $(docker ps -a -q --filter ancestor=chris-proxy-service --format=\"{{.ID}}\"))",
+    "dockerBuild": "docker build --rm -t chris-proxy-service .",
+    "dockerRun": "docker run -p 80:80 chris-proxy-service"
+}
+```
+### 1.5.11. NODE_ENV environment variable
+
+TO know which host urls to use (`development` or `production`) the first thing we need to do is specify this in an *Environment Variable*. in node these can be accessed via the  `process.env` object.
+
+To get this working was that for both the proxy and service we needed to set the `process.env.NODE_ENV` variable to `production`. For the service react app this was done already by using the `--mode production` flag in the webpack build process. For the proxy / server side, this was set in the Dockerfile image via `ENV NODE_ENV=production`! Then we need to check it.
+
+Next, we need to check it. here are the excerpts ..
+
+**app.js** (react app)
+
+``` js
+
+let SERVICE_HOSTS = {};
+
+if (process.env.NODE_ENV === 'production') {
+  SERVICE_HOSTS = {
+    trails: 'http://trail-env.8jhbbn2nrv.us-west-2.elasticbeanstalk.com/',
+    profile: '[to be added]',
+    photos: 'http://trail-photos-service-dev.us-west-1.elasticbeanstalk.com',
+    reviews: 'http://trail-photos-service-dev.us-west-1.elasticbeanstalk.com',
+    paths: 'http://ec2-54-172-80-40.compute-1.amazonaws.com',
+  };
+} else {
+  SERVICE_HOSTS = {
+    trails: 'http://localhost:3001',
+    profile: 'http://localhost:3002',
+    photos: 'http://localhost:3003',
+    reviews: 'http://localhost:3004',
+    paths: 'http://localhost:3005',
+  };
+}
+
+```
+
+For the [proxy service](https://github.com/rpt09-scully/chris-proxy-service/), this had to be handled differently since it occurs at load time and serverside. I used `express-handlebars` template engine for `express`, to render a different set of script tags depending on the env variable see that excert here:
+
+*** index.js** (proxy)
+``` js
+app.get('/:trailId(\\d+$)*?', (req, res) => {
+  // we set env_production to the boolean conditional
+  res.status(200).render('layout', {env_production: (process.env.NODE_ENV === 'production')});
+});
+```
+
+**layout.html** (proxy)
+``` html
+
+<!-- load services -->
+  {{#if env_production }}
+  <script src='http://trail-env.8jhbbn2nrv.us-west-2.elasticbeanstalk.com/app.js'></script>
+  <script src=''></script>
+  <script src='http://trail-photos-service-dev.us-west-1.elasticbeanstalk.com/app.js'></script>
+  <script src='http://reviewservice.jsxvmg3wq3.us-west-1.elasticbeanstalk.com/app.js'></script>
+  <script src='http://ec2-54-172-80-40.compute-1.amazonaws.com/app.js'></script>
+  {{else}}
+  <script src='http://localhost:3001/app.js'></script>
+  <script src='http://localhost:3002/app.js'></script>
+  <script src='http://localhost:3003/app.js'></script>
+  <script src='http://localhost:3004/app.js'></script>
+  <script src='http://localhost:3005/app.js'></script>
+  {{/if}}
+  <!-- DOM that -->
+
+  ```
+
+
