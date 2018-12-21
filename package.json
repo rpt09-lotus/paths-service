@@ -13,7 +13,7 @@
     "test": "jest ./test/",
     "build": "webpack -d --config ./webpack.config.js --mode production",
     "buildWatch": "webpack -d --watch --config ./webpack.config.js --mode development",
-    "deploy": "scp -i \"~/.ssh/mine2.pem\" .env.production  ec2-user@ec2-54-172-80-40.compute-1.amazonaws.com:/home/ec2-user/app/.env && rsync --include .git --exclude-from=\"$(git -C . ls-files --exclude-standard -oi --directory >.git/ignores.tmp && echo .git/ignores.tmp)\" -rave \"ssh -i ~/.ssh/mine2.pem\" . ec2-user@ec2-54-172-80-40.compute-1.amazonaws.com:/home/ec2-user/app",
+    "deploy": "npm run build && scp -i \"~/.ssh/mine2.pem\" .env.production  ec2-user@ec2-54-172-80-40.compute-1.amazonaws.com:/home/ec2-user/app/.env && rsync --include .git --exclude-from=\"$(git -C . ls-files --exclude-standard -oi --directory >.git/ignores.tmp && echo .git/ignores.tmp)\" -rave \"ssh -i ~/.ssh/mine2.pem\" . ec2-user@ec2-54-172-80-40.compute-1.amazonaws.com:/home/ec2-user/app",
     "dockerPrune": "docker system prune",
     "dockerStop": "docker rm $(docker stop $(docker ps -a -q --filter ancestor=9trails-paths --format=\"{{.ID}}\"))",
     "dockerBuild": "docker build --rm -t 9trails-paths .",
