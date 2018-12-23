@@ -21,6 +21,7 @@
     "dbr": "npm run dockerBuild && npm run dockerRun"
   },
   "dependencies": {
+    "@mapbox/mapbox-gl-native": "^4.1.0",
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "dotenv": "^6.1.0",
@@ -30,8 +31,9 @@
     "react": "~16.5.2",
     "react-dom": "~16.5.2",
     "react-mapbox-gl": "~3.9.2",
-    "request-promise": "^4.2.2",
     "request": "^2.88.0",
+    "request-promise": "^4.2.2",
+    "sharp": "^0.21.1",
     "xml2json": "^0.11.2"
   },
   "devDependencies": {
