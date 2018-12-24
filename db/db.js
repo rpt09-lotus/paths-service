@@ -109,7 +109,6 @@ module.exports = {
           return awsHelper.getS3Url(url);
         });
         const randomGPXBackfill = validGPXPool[Math.floor(this.seededRandom(obj.id) * validGPXPool.length)];
-        debugger;
         console.log('backfilling with random gpx backfill:', randomGPXBackfill);
         const json = await awsHelper.readGPXByUrl(randomGPXBackfill);
         // edit obj to preserve true (but broken gpx url)

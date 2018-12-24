@@ -5,13 +5,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const cors = require('cors');
 const path = require('path');
-const requestPromise = require('request-promise');
-
-// mapbox gl native requirement
-const fs = require('fs');
-const mbgl = require('@mapbox/mapbox-gl-native');
-const sharp = require('sharp');
-const {Readable} = require('stream');
+const staticMap = require('../services/staticMap.js');
 
 const PORT = process.env.PORT;
 
@@ -76,159 +70,11 @@ app.get('/paths', (req, res) => {
   });
 });
 
-app.get('/paths/:pathId/image/', (req, res) => {
-
-  const bufferToStream = (buffer) => { 
-    let stream = new Readable ();
-    stream.push(buffer);
-    stream.push(null);
-    return stream;
-  };
-
-  db.getPathById(req.params.pathId).then((result) => {
-    const bounds = result[0].gpx_data.bounds;
-    const points = result[0].gpx_data.points.map(({ lat, lon }) => {
-      return [parseFloat(lon), parseFloat(lat)];
-    });
-    
-    console.log(result);
-
-    var options = {
-      request: function(req, callback) {
-        requestPromise({
-          url: req.url,
-          encoding: null,
-          gzip: true
-        })
-          .then((result) => {
-            var response = {};
-            // if (result.headers.modified) { 
-            //   response.modified = new Date(result.headers.modified); 
-            // }
-            // if (result.headers.expires) { 
-            //   response.expires = new Date(result.headers.expires); 
-            // }
-            // if (result.headers.etag) { 
-            //   response.etag = result.headers.etag; 
-            // }
-            
-            response.data = result;
-            callback(null, response);
-          })
-          .catch((error) => {
-            console.log('request error!', error);
-            
-            if (error.error) {
-              bufferToStream(error.error).pipe(res);
-            } else {
-              res.errorJSON(error);
-            }
-          });
-      },
-      ratio: 1
-    };
-    var map = new mbgl.Map(options);
-    
-    console.log('latitude:', bounds.maxlat - bounds.minlat);
-    console.log('longitude:', bounds.maxlon - bounds.minlon);
-    
-    map.load(require(path.join(__dirname, 'assets', 'mapbox', 'style.json')));
-    
-    // map.fitBounds([
-    //   [bounds.minlon, bounds.minlat],
-    //   [bounds.maxlon, bounds.maxlat]
-    // ], {padding: 50});
-
-    console.log(
-      Number(bounds.minlat) + Number(bounds.maxlat) / 2, 
-      Number(bounds.minlon) + Number(bounds.maxlon) / 2
-    );
-
-    map.addSource('mySource', {
-      'id': 'mySource',
-      'type': 'geojson',
-      'data':
-        {
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'LineString',
-            coordinates: points
-          }
-        },
-      'paint': {
-        'line-color': '#c0c0c0',
-        // 'line-opacity': 0.8
-      }
-    });
-
-    map.addLayer({
-      'type': 'FeatureCollection',
-      'id': 'trailPath',
-      'type': 'line',
-      'source': 'mySource',
-      'layout': {
-        'line-join': 'round',
-        'line-cap': 'round'
-      },
-      'paint': {
-        'line-color': '#888',
-        'line-width': 2,
-        'line-opacity': 0.8
-      }
-    });
-
-    map.render({
-      zoom: 13, 
-      // 13.5: 0.013, *0.013
-      // 13: 0.020, 0.036*  
-      //12: --> lat: 0.007, *0.04,
-      //  11: lat 0.03423999999999694,  lng: *0.0956600000000094,
-      //  10.75: *.086 .01
-      // 8.75 --> *0.38 0.32
-      center: [ 
-        (Number(bounds.minlon) + Number(bounds.maxlon)) / 2,
-        (Number(bounds.minlat) + Number(bounds.maxlat)) / 2
-
-      ]
-      // bounds: [
-      //   [bounds.minlon, bounds.minlat],
-      //   [bounds.maxlon, bounds.maxlat]
-      // ]
-      // style: 'mapbox://styles/cjm771/cjpjymsoc0nsz2slnpyrkxdol'
-    }, function(err, buffer) {
-      if (err) { 
-        console.log('error:', err);
-        res.errorJSON(err, 500);
-      }
-    
-      map.release();
-    
-      var image = sharp(buffer, {
-        raw: {
-          width: 512,
-          height: 512,
-          channels: 4
-        }
-      });
-    
-      // Convert raw image buffer to PNG
-      image.png().toBuffer()
-        .then( (data) => {
-          
-          // res.writeHead(200, 'image/png');
-          bufferToStream(data).pipe(res);
-        })
-        .catch( (err) => {
-          console.log('buffer error:', err);
-          // TODO convert to image error
-          res.errorJSON(err, 500);
-        });
-    });
-  
-  }).catch((error) => {
-
-    res.errorJSON(`${error}`, 500);
+app.get('/paths/:pathId/image/:width(\\d+)/:height(\\d+)', (req, res) => {
+  staticMap.renderStaticMap(req.params.pathId, req.params.width, req.params.height).then((stream) => {
+    stream.pipe(res);
+  }).catch((err) => {
+    res.errorJSON(err.message || err);
   });
 });
 
