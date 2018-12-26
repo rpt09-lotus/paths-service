@@ -1,0 +1,14 @@
+.ranking-wpr {
+
+  .star {
+
+    color: #333;
+    opacity: 0.3;
+    display: inline-block;
+
+    &.filled {
+      opacity: 1;
+    }
+  }
+
+}
