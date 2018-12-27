@@ -39,11 +39,7 @@ ns.CanonicalPath = class CanonicalPath extends React.Component {
 
   render() {
     return (
-      <div className='col-12'>
-        <h1>Canonical Path Widget</h1>
-        <p className={style.test}>This will <span className={style.red}>be</span> the main path widget of the page</p>
-        <PathWidget trailId={this.state.trailId} serviceHosts={SERVICE_HOSTS} />
-      </div>
+      <PathWidget trailId={this.state.trailId} serviceHosts={SERVICE_HOSTS} />
     );
   }
     
@@ -61,10 +57,7 @@ ns.Recordings = class Recordings extends React.Component {
 
   render() {
     return (
-      <div>
-        <h1>Recordings Widget</h1>
-        <RecordingsList trailId={this.state.trailId} serviceHosts={SERVICE_HOSTS} />
-      </div>
+      <RecordingsList trailId={this.state.trailId} serviceHosts={SERVICE_HOSTS} />
     );
   }
 };

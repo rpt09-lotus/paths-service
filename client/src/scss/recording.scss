@@ -2,6 +2,24 @@
   min-height: 100px;
   margin: 2rem 0;
 
+  .userInfo {
+    text-align: center;
+    font-size: 0.8rem;
+    .name {
+      color: #333;
+      margin: .5rem 0;
+    }
+
+    .joined {
+      color: #c0c0c0;
+      font-size: 0.8em;
+    }
+  }
+  .comment {
+    font-size: .9rem;
+    text-transform: capitalize;
+  }
+
   .rightCol {
     text-align: right;
 

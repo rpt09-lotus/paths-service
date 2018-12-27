@@ -9,19 +9,18 @@ class ProfilePic extends React.Component {
     };
   }
 
-  componentDidMount() {
-    setTimeout(() => {
-      this.setState({
-        loaded: true
-      });
-    }, 5000);
-  }
-
   render() {
     return (
       <div className={profilePicStyle['profile-image-wpr']}>
         <div className={profilePicStyle['default-image']}>
-          <div className={`${profilePicStyle['profile-image']} ${(this.state.loaded) ? profilePicStyle['loaded'] : ''}`}>
+          <div 
+            className={`${profilePicStyle['profile-image']} ${(this.props.user) ? profilePicStyle['loaded'] : ''}`}
+            style={!this.props.user ? {} : {
+              background: `url(${this.props.user.photo_url})`,
+              backgroundPosition: 'center',
+              backgroundSize: 'cover'
+            }}
+          >
           </div>
         </div>
       </div>
