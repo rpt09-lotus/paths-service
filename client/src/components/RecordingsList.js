@@ -30,7 +30,7 @@ export default class RecordingsList extends React.Component {
     return (this.state.loading) ? (<div className='loading'></div>) : (
       !this.state.recordings.length ? (<div className='info'>No Recordings for this route.</div>) : (
         this.state.recordings.map((recording, index) => (
-          <Recording key={index} recording={recording} />
+          <Recording key={index} recording={recording} serviceHosts={this.props.serviceHosts} />
         ))
       )
     );
