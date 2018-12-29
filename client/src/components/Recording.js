@@ -2,13 +2,17 @@ import Moment from 'react-moment';
 import recordingStyle from '../scss/recording.scss';
 import ProfilePic from './ProfilePic';
 import RankingStars from './RankingStars';
+import PathWidget from './PathWidget';
+import SVG from 'react-inlinesvg';
 
 class Recording extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      user: null
+      user: null,
+      loading: true
     };
+    this.onSVGLoad = this.onSVGLoad.bind(this);
   }
 
   componentDidMount() {
@@ -23,6 +27,13 @@ class Recording extends React.Component {
     });
   }
 
+  onSVGLoad(src) {
+    console.log(src, 'loaded!');
+    this.setState({
+      loading: false
+    });
+    debugger;
+  }
   render() {
     const {recording, serviceHosts} = this.props;
 
@@ -34,7 +45,7 @@ class Recording extends React.Component {
           { !this.state.user ? '' : (
             <div className={recordingStyle.userInfo}>
               <div className={recordingStyle.name}>
-                {this.state.user.first_name}
+                {this.state.user.first_name} {this.state.user.pro ? <span className='badge badge-success'>Pro</span> : ''}
               </div>
               <div className={recordingStyle.joined}>
                 joined <Moment fromNow ago>{this.state.user.date_joined}</Moment> ago
@@ -62,8 +73,16 @@ class Recording extends React.Component {
             </div>
           </div>
           <div className={`${recordingStyle.staticMapWpr} col-12`}>
-            <div className={recordingStyle.staticMap}>
-              <img src={`${serviceHosts.paths}/paths/${recording.id}/image/500/200`} />
+            <div 
+              className={`${recordingStyle.staticMap} ${!this.state.loading ? recordingStyle.loaded : ''}`}
+              id={`pathMap-${recording.id}`}
+            >
+              <SVG
+                src={`${serviceHosts.paths}/paths/${recording.id}/image/500/200`}
+                onLoad={(src) => { this.onSVGLoad(recording.id); }}
+              ></SVG>
+              {/* <img src={`${serviceHosts.paths}/paths/${recording.id}/image/500/200?mode=png`} /> */}
+              {/* <PathWidget pathId={recording.id} serviceHosts={this.props.serviceHosts} /> */}
             </div>
           </div>
         </div>

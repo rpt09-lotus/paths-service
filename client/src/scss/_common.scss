@@ -1,0 +1,18 @@
+.loading {
+  min-height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &::before {
+    content: url(https://s3.amazonaws.com/9trails-gpx/general/loading_spinner.gif);
+    transform: scale(.25);
+    display: block;
+  }
+}
+
+.info {
+  font-style: italic;
+  color: #c0c0c0;
+  text-align: center;
+  margin: 3rem 0;
+}

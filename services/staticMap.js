@@ -1,9 +1,13 @@
 const requestPromise = require('request-promise');
 const db = require('../db/db.js');
 const mbgl = require('@mapbox/mapbox-gl-native');
+
+const mbvp = require('@mapbox/geo-viewport');
 const styleJson = require('../server/assets/mapbox/style.json');
 const sharp = require('sharp');
 const {Readable} = require('stream');
+const {Image, createCanvas} = require('canvas');
+const pathUtils = require('./pathUtils');
 
 const staticMap = module.exports = {
   bufferToStream: (buffer) => { 
@@ -12,7 +16,7 @@ const staticMap = module.exports = {
     stream.push(null);
     return stream;
   },
-  renderStaticMap: (pathId, width = 800, height = 300) => {
+  renderStaticMap: (pathId, width = 800, height = 300, drawChart = true, mode = 'svg') => {
 
     const modifier = 0.45;
     return db.getPathById(pathId).then((result) => {
@@ -20,11 +24,12 @@ const staticMap = module.exports = {
       height = Number(height);
       if (isNaN(width) || isNaN(height)) {
         throw 'Width and Height values must be numbers.';
-      } else if (width < 1|| height < 1) {
+      } else if (width < 1 || height < 1) {
         throw 'Width and Height  values must be greater than 0';
       }
       // get gpx data
       const bounds = result[0].gpx_data.bounds;
+      const ZOOM = staticMap.getBoundsZoomLevel(bounds, {width: width * modifier, height: height * modifier});
       const points = result[0].gpx_data.points.map(({ lat, lon }) => {
         return [parseFloat(lon), parseFloat(lat)];
       });
@@ -57,7 +62,6 @@ const staticMap = module.exports = {
       
       var map = new mbgl.Map(options);
       map.load(styleJson);
-      
       map.addSource('mySource', {
         'id': 'mySource',
         'type': 'geojson',
@@ -86,21 +90,27 @@ const staticMap = module.exports = {
         },
         'paint': {
           'line-color': '#888',
-          'line-width': 2,
+          'line-width': ZOOM / 6,
           'line-opacity': 0.8
         }
       });
 
       return new Promise((resolve, reject) => {
+        const centerPt = [ 
+          (Number(bounds.minlon) + Number(bounds.maxlon)) / 2,
+          (Number(bounds.minlat) + Number(bounds.maxlat)) / 2
+
+        ];
+        const calcBounds = mbvp.bounds(centerPt, ZOOM, [width * .5, height * .5]);
+        // const calvViewport = mbvp.viewport(calcBounds, [0])
+        console.log('bounds:', calcBounds);
+        const convertedPixels = pathUtils.convertToPX(centerPt, calcBounds, width, height);
+        console.log('converted pixels:', convertedPixels);
         map.render({
           width: width,
           height: height,
-          zoom: staticMap.getBoundsZoomLevel(bounds, {width: width * modifier, height: height * modifier}),  
-          center: [ 
-            (Number(bounds.minlon) + Number(bounds.maxlon)) / 2,
-            (Number(bounds.minlat) + Number(bounds.maxlat)) / 2
-  
-          ]
+          zoom: ZOOM,  
+          center: centerPt
         }, function(err, buffer) {
           if (err) { 
             // res.errorJSON(err, 500);
@@ -117,12 +127,35 @@ const staticMap = module.exports = {
             }
           });
         
-          // Convert raw image buffer to PNG
-          
           return image.png().toBuffer()
-            .then( (data) => {
-              resolve(staticMap.bufferToStream(data));
-            }).catch( (err) => {
+            .then ( (buffer) => {
+              if (drawChart) {
+                const lineData = pathUtils.getElevBarsAsLines(pathUtils.redividePath(result[0].gpx_data.points, 100), width, height * 0.2);
+                const canvas = createCanvas(width, height, mode === 'svg' ? 'svg' : null);
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                img.onload = () => ctx.drawImage(img, 0, 0);
+                img.onerror = err => { throw err; };
+                img.src = buffer;
+               
+               
+                lineData.forEach((point) => {
+                  const convertedPixels = pathUtils.convertToPX(pathUtils.getPointAsArray(point), calcBounds, width, height);
+                  ctx.globalAlpha = 0.0;
+                  ctx.fillStyle = '#ff0000';
+                  ctx.beginPath();
+                  ctx.arc(convertedPixels[0], convertedPixels[1], ZOOM / 6, 0, 2 * Math.PI);
+                  ctx.fill();
+                  ctx.globalAlpha = 0.25;
+                  ctx.fillStyle = '#333';
+                  ctx.fillRect(point.lineStart[0], height - point.lineEnd[1], point.width * 0.5, point.height);
+                });
+                resolve(staticMap.bufferToStream(canvas.toBuffer('image/png')));
+              } else {
+                resolve(staticMap.bufferToStream(buffer));
+              }
+            })
+            .catch( (err) => {
               reject(err);
             });
         });

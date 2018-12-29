@@ -71,7 +71,8 @@ app.get('/paths', (req, res) => {
 });
 
 app.get('/paths/:pathId/image/:width(\\d+)/:height(\\d+)', (req, res) => {
-  staticMap.renderStaticMap(req.params.pathId, req.params.width, req.params.height).then((stream) => {
+  staticMap.renderStaticMap(req.params.pathId, req.params.width, req.params.height, true, req.mode).then((stream) => {
+    console.log('stream?', stream);
     stream.pipe(res);
   }).catch((err) => {
     res.errorJSON(err.message || err);

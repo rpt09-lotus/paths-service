@@ -1,0 +1,21 @@
+.main {
+  .nav {
+    margin: 3rem 0;
+
+    .rightCol {
+      text-align: right;
+      
+
+      select {
+        float: right;
+        max-width: 200px;
+        outline: none !important;
+        box-shadow: none;
+        background-color: #f8f9fa;
+        border: none;
+      }
+  
+
+    }
+  }
+}
