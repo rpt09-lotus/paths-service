@@ -141,10 +141,10 @@ const staticMap = module.exports = {
                
                 lineData.forEach((point) => {
                   const convertedPixels = pathUtils.convertToPX(pathUtils.getPointAsArray(point), calcBounds, width, height);
-                  ctx.globalAlpha = 0.0;
+                  ctx.globalAlpha = 0.01;
                   ctx.fillStyle = '#ff0000';
                   ctx.beginPath();
-                  ctx.arc(convertedPixels[0], convertedPixels[1], ZOOM / 6, 0, 2 * Math.PI);
+                  ctx.arc(convertedPixels[0], convertedPixels[1], ZOOM / 3, 0, 2 * Math.PI);
                   ctx.fill();
                   ctx.globalAlpha = 0.25;
                   ctx.fillStyle = '#333';

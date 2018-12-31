@@ -4,15 +4,22 @@ import ProfilePic from './ProfilePic';
 import RankingStars from './RankingStars';
 import PathWidget from './PathWidget';
 import SVG from 'react-inlinesvg';
+import Tooltip from './Tooltip';
 
 class Recording extends React.Component {
   constructor (props) {
     super(props);
+    this.timer = null;
+    this.bounceBefore = 50;
     this.state = {
       user: null,
-      loading: true
+      loading: true,
+      mouseEvent: null,
+      eventFree: true,
+      tooltipContent: null
     };
     this.onSVGLoad = this.onSVGLoad.bind(this);
+    this.updateTooltipPosition = this.updateTooltipPosition.bind(this);
   }
 
   componentDidMount() {
@@ -26,13 +33,102 @@ class Recording extends React.Component {
       console.log('Error when fetching user:', error);
     });
   }
+  
+  updateTooltipPosition(e) {
+    var cumulativeOffset = function(element) {
+      var top = 0;
+      var left = 0;
+      do {
+        top += element.offsetTop  || 0;
+        left += element.offsetLeft || 0;
+        element = element.offsetParent;
+      } while (element);
+  
+      return {
+        top: top,
+        left: left
+      };
+    };
+    const tooltip = document.getElementById('pathTooltip-' + this.props.recording.id);
+    if (e) {
+      const parent = document.getElementById('pathMap-' + this.props.recording.id);
+      const {top: parentTop, left: parentLeft} = cumulativeOffset(parent);
+      const parentWidth = parent.clientWidth;
+      const parentHeight = parent.clientHeight;
+      tooltip.style.left =
+          (e.pageX - parentLeft + tooltip.clientWidth + 10 < parentWidth)
+            ? (e.pageX - parentLeft + 10 + 'px')
+            : (parentWidth + 5 - tooltip.clientWidth + 'px');
+      tooltip.style.top =
+          (e.pageY - parentTop + tooltip.clientHeight + 10 < parentHeight)
+            ? (e.pageY - parentTop + 10 + 'px')
+            : (parentHeight + 5 - tooltip.clientHeight + 'px');
+      tooltip.innerHTML = 'o hai';
+      tooltip.style.opacity = 1;
+    } else {
+      tooltip.style.opacity = 0;
+    }
+  }
 
-  onSVGLoad(src) {
-    console.log(src, 'loaded!');
+  onSVGLoad(id) {
+    console.log(id, 'loaded!');
     this.setState({
       loading: false
     });
-    debugger;
+    const els = document.querySelectorAll(`#pathMap-${id} svg path`);
+    els.forEach((el, index) => {
+      let elToShow;
+      if (index % 2 === 0) {
+        elToShow = els[index + 1];
+      } else {
+        elToShow = els[index - 1];
+      }
+      console.log(index);
+      document.querySelectorAll(`#pathMap-${id} svg path`)[index].style.pointerEvents = 'all';
+
+      const originalEl = {
+        fill: el.style.fill,
+        fillOpacity: el.style.fillOpacity
+      };
+
+      const originalElToShow = {
+        fill: elToShow.style.fill,
+        fillOpacity: elToShow.style.fillOpacity
+      };
+      el.addEventListener('pointerover', (e) => {
+
+        console.log(index + 'path highlighted!');
+        // update tooltip
+        clearTimeout(this.timer);
+        this.timer = setTimeout(() => {
+          this.updateTooltipPosition(e);
+        }, this.bounceBefore);
+
+        console.log('hover over');
+
+
+        [el, elToShow].forEach(currEl => {
+          currEl.style.fill = '#ff0000';
+          currEl.style.fillOpacity = 0.85;
+        });
+      });
+      el.addEventListener('pointerout', (e) => {
+        clearTimeout(this.timer);
+        this.timer = setTimeout(() => {
+          this.updateTooltipPosition(null);
+        }, this.bounceBefore);
+        console.log('hover out');
+        [el, elToShow].forEach((currEl, index) => {
+          if (index === 0) {
+            currEl.style.fill = originalEl.fill;
+            currEl.style.fillOpacity = originalEl.fillOpacity;
+          } else {
+            currEl.style.fill = originalElToShow.fill;
+            currEl.style.fillOpacity = originalElToShow.fillOpacity;
+          }
+        });
+      });
+    });
   }
   render() {
     const {recording, serviceHosts} = this.props;
@@ -77,9 +173,12 @@ class Recording extends React.Component {
               className={`${recordingStyle.staticMap} ${!this.state.loading ? recordingStyle.loaded : ''}`}
               id={`pathMap-${recording.id}`}
             >
+              <Tooltip
+                id={recording.id}
+              />
               <SVG
                 src={`${serviceHosts.paths}/paths/${recording.id}/image/500/200`}
-                onLoad={(src) => { this.onSVGLoad(recording.id); }}
+                onLoad={(src) => { setTimeout(() => { this.onSVGLoad(recording.id); }, 100); } }
               ></SVG>
               {/* <img src={`${serviceHosts.paths}/paths/${recording.id}/image/500/200?mode=png`} /> */}
               {/* <PathWidget pathId={recording.id} serviceHosts={this.props.serviceHosts} /> */}

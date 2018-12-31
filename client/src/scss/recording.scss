@@ -36,6 +36,7 @@
 
   .staticMap {
     margin-top: 2rem;
+    position: relative;
     width: 100%;
     padding-right: 0;
     min-height: 200px;
@@ -43,6 +44,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+
   
     
     &::before {
