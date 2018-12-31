@@ -1,7 +1,7 @@
 const requestPromise = require('request-promise');
 const db = require('../db/db.js');
 const mbgl = require('@mapbox/mapbox-gl-native');
-
+const path = require('path');
 const mbvp = require('@mapbox/geo-viewport');
 const styleJson = require('../server/assets/mapbox/style.json');
 const sharp = require('sharp');
@@ -139,13 +139,22 @@ const staticMap = module.exports = {
                 img.src = buffer;
                
                
-                lineData.forEach((point) => {
+                lineData.forEach((point, index) => {
                   const convertedPixels = pathUtils.convertToPX(pathUtils.getPointAsArray(point), calcBounds, width, height);
-                  ctx.globalAlpha = 0.01;
-                  ctx.fillStyle = '#ff0000';
-                  ctx.beginPath();
-                  ctx.arc(convertedPixels[0], convertedPixels[1], ZOOM / 3, 0, 2 * Math.PI);
-                  ctx.fill();
+                  if (index === 0) {
+                    ctx.strokeStyle = 'blue';
+                    ctx.lineWidth = 2;
+                    ctx.globalAlpha = 0.25;
+                    ctx.beginPath();
+                    ctx.arc(convertedPixels[0], convertedPixels[1], ZOOM / 3, 0, 2 * Math.PI);
+                    ctx.stroke();
+                  } else {
+                    ctx.fillStyle = '#ff0000';
+                    ctx.globalAlpha = 0.01;
+                    ctx.beginPath();
+                    ctx.arc(convertedPixels[0], convertedPixels[1], ZOOM / 3, 0, 2 * Math.PI);
+                    ctx.fill();
+                  }
                   ctx.globalAlpha = 0.25;
                   ctx.fillStyle = '#333';
                   ctx.fillRect(point.lineStart[0], height - point.lineEnd[1], point.width * 0.5, point.height);

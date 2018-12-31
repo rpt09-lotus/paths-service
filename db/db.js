@@ -1,5 +1,6 @@
 const { Client } = require('pg');
 const awsHelper = require('../services/aws.js');
+const pathUtils = require('../services/pathUtils.js');
 const dotenv = require('dotenv').config();
 
 const client = new Client({
@@ -139,14 +140,19 @@ module.exports = {
         return new Date(parseInt(val)).toJSON();
       }}, {
       'gpx_data': async (val, obj) => {
+        let gpxData = null;
         try {
-          const json = await awsHelper.readGPXByUrl( awsHelper.getS3Url(obj.gpx_url));
-          return json;
+          gpxData = await awsHelper.readGPXByUrl( awsHelper.getS3Url(obj.gpx_url));
         } catch (e) {
           console.log('error: couldn\'t parse obj.gpx_url:', e);
           // we can't get all gpx data so we will backfill with a random val
-          return await this.backfillNonExistentGPX(obj);
+          gpxData = await this.backfillNonExistentGPX(obj);
         }
+        const elevUnits = 'feet';
+        gpxData.min_max_elevation = {units: elevUnits, value: pathUtils.getMinMaxElevation(gpxData.points, {units: elevUnits})};
+        const lengthUnits = 'miles';
+        gpxData.length = {units: lengthUnits, value: pathUtils.getPathLength(gpxData.points, {units: lengthUnits})};
+        return gpxData;
       },
     }];
     // create new object
@@ -235,9 +241,9 @@ module.exports = {
       });
     });
   },
-  getHeroPathByTrailId: function(id) {
+  getHeroPathByTrailId: function(id, redividePath = null) {
     return client.query('SELECT * FROM paths WHERE trail_id=$1 AND is_hero_path=$2', [id, true]).then((data) => {
-      return this.formatDataAll(data.rows, [...this.baseFormatting, 'gpx_data']);
+      return this.formatIndividualPath(data, redividePath);
     });
   },
   getValidGPXs: function() {
@@ -247,9 +253,19 @@ module.exports = {
       });
     });
   },
-  getPathById: function(id) {
+  formatIndividualPath: function(data, redividePath = null) {
+    return this.formatDataAll(data.rows, [...this.baseFormatting, 'gpx_data']).then((data) => {
+      if (redividePath) {
+        data[0].gpx_data.redividedPoints = pathUtils.redividePath(data[0].gpx_data.points, redividePath);
+        return data;
+      } else {
+        return data;
+      }
+    });
+  },
+  getPathById: function(id, redividePath = null) {
     return client.query('SELECT * FROM paths WHERE id=$1', [id]).then((data) => {
-      return this.formatDataAll(data.rows, [...this.baseFormatting, 'gpx_data']);
+      return this.formatIndividualPath(data, redividePath);
     });
   },
   getTrailHeadById: function(id) {

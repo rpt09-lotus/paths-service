@@ -7,20 +7,31 @@ const pathUtils = module.exports = {
       return (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
     };
   },
+  getMinMaxElevation: (points, opts) => {
+    opts = Object.assign({units: 'meters'}, opts);
+    // should return start and end points
+    // first init min, max
+    let min = 999999999;
+    let max = -999999999;
+    points.forEach(({ele}) => {
+      min = Math.min(Number(ele), min);
+      max = Math.max(Number(ele), max);
+    });
+    const unitsDic = {
+      'meters': 1,
+      'feet': 3.28084
+    };
+    return {
+      min: min * unitsDic[opts.units],
+      max: max * unitsDic[opts.units]
+    };
+  },
   // get elevation bars as lines
   getElevBarsAsLines: (points, width, height) => {
     if (points[0].ele === undefined) {
       return false;
     } else {
-      // should return start and end points
-      // first init min, max
-      let min = 999999999;
-      let max = -999999999;
-      points.forEach(({ele}) => {
-        min = Math.min(Number(ele), min);
-        max = Math.max(Number(ele), max);
-      });
-
+      const {min, max} = pathUtils.getMinMaxElevation(points);
       const heightRemapper = pathUtils.createRemap(min, max, .2, 1);
       const buffer = Math.floor(width / points.length);
       const widthRemapper = pathUtils.createRemap(0, points.length - 1, buffer, width - buffer);
@@ -34,10 +45,6 @@ const pathUtils = module.exports = {
       });
     }
   
-  },
-  // get elvation bars as rects
-  getElevBarsAsRects: (data, width, height) => {
-
   },
   getPointAsArray: (point) => {
     return [parseFloat(point.lon), parseFloat(point.lat)];
@@ -92,6 +99,11 @@ const pathUtils = module.exports = {
       }
     });
     return Object.assign({}, closestPoint);
+  },
+  getPathLength: (points, opts = {}) => {
+    const pts = pathUtils.getPointsAsArray(points);
+    const path = lineString(pts, {name: 'path'});
+    return length(path, opts);
   },
   // redivide path
   redividePath: (points, segmentCount) => {

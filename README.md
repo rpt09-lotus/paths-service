@@ -63,12 +63,12 @@ Note: that those with an asterisk *(\*)* will have more detailed information , a
     - retrieves all recordings (excluding hero path) for a specified trail id. sort optionas as shown (optional!)
   - POST `/:trailId/recordings`
     - post a user path recording to a specified trail id.
-  - GET `/paths/:pathId` * 
-    - retrieves detailed information about a path by a given ID in database. this also will retrieve gpx data.
-  - GET `/paths/:pathId/image/:width/:height`
-    - renders static PNG map on server side given width and height
+  - GET `/paths/:pathId?redividePath={null|{<number>}` * 
+    - retrieves detailed information about a path by a given ID in database. this also will retrieve gpx data. An additional parameter for gpxData will be given called `redividedPoints` if you provide redividePath query parameter. This will redistribute the points for a given amount i.e. `100` will return 100 points regardless of points in gpx file.
+  - GET `/paths/:pathId/image/:width/:height?mode={svg|png}`
+    - renders static PNG/SVG map on server side given width and height. default: SVG.
   - GET `/:trailId/heroPath` * 
-    - retrieves detailed information about the canonical path for a given trail data. this also will retrieve gpx data.
+    - retrieves detailed information about the canonical path for a given trail data. this also will retrieve gpx data.  An additional parameter for gpxData will be given called `redividedPoints` if you provide redividePath query parameter. This will redistribute the points for a given amount i.e. `100` will return 100 points regardless of points in gpx file.
   - GET `/:trailId/trailHead` * 
     - retrieves first point of the canonical path for a given trail from the database if available.
 
