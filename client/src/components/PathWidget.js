@@ -88,7 +88,10 @@ export default class PathWidget extends React.Component {
         afterLayerId: 'geojson-1-line',
         'source': 'point',
         'paint': {
-          'circle-radius': 30,
+          'circle-radius': {
+            'base': 10,
+            'stops': [[1, 10], [24, 5]]
+          },
           'circle-opacity': 0.5,
           'circle-color': '#ff0000'
         }

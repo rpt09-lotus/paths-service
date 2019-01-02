@@ -1,16 +1,25 @@
 import commonStyle from '../scss/_common.scss';
 import RecordingsListStyle from '../scss/recordingsList.scss';
 import Recording from './Recording';
+import SubmitForm from './SubmitForm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 export default class RecordingsList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       recordings: [],
-      loading: true
+      loading: true,
+      submitFormVisible: false
     };
+    this.showSubmissionForm = this.showSubmissionForm.bind(this);
+  }
+
+  showSubmissionForm() {
+    this.setState({
+      submitFormVisible: !this.state.submitFormVisible
+    });
   }
 
   componentDidMount() {
@@ -35,8 +44,13 @@ export default class RecordingsList extends React.Component {
         <div className={`${RecordingsListStyle.main}`}>
           <div className={`${RecordingsListStyle.nav} row`}>
             <div className='col-6'>
-              <button className='btn btn-light'>
-                <FontAwesomeIcon icon={faPlus} /> Add a recording
+              <button className='btn btn-light' onClick={this.showSubmissionForm}>
+                {
+                  (!this.state.submitFormVisible ? (
+                    <span><FontAwesomeIcon icon={faPlus} /> Add a recording</span>
+                  ) : <span><FontAwesomeIcon icon={faTimes} /> Cancel</span>
+                  )
+                }
               </button>
             </div>
             <div className={`${RecordingsListStyle.rightCol} col-6`}>
@@ -48,7 +62,10 @@ export default class RecordingsList extends React.Component {
               </select>
             </div>
           </div>
-          {
+          <SubmitForm
+            visible={this.state.submitFormVisible}
+          />
+          { 
             this.state.recordings.map((recording, index) => (
               <Recording key={index} recording={recording} serviceHosts={this.props.serviceHosts} />
             ))
