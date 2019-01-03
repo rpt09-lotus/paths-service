@@ -25,7 +25,6 @@ class Recording extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    console.log(this.props, nextProps);
     let shouldUpdate = false;
     Object.keys(this.state).forEach((itemKey) => {
       if (this.state[itemKey] !== nextState[itemKey]) {
@@ -103,11 +102,11 @@ class Recording extends React.Component {
           (e.pageY - parentTop + tooltip.clientHeight + 10 < parentHeight)
             ? (e.pageY - parentTop + 10 + 'px')
             : (parentHeight + 5 - tooltip.clientHeight + 'px');
-      
+      tooltip.style.display = 'block';
       tooltip.style.opacity = 1;
     } else {
       tooltip.style.opacity = 0;
-      
+      tooltip.style.display = 'none';
     }
   }
 
@@ -156,7 +155,6 @@ class Recording extends React.Component {
         this.timer = setTimeout(() => {
           this.updateTooltipPosition(null);
         }, this.bounceBefore);
-        console.log('hover out');
         [el, elToShow].forEach((currEl, index) => {
           if (index === 0) {
             currEl.style.fill = originalEl.fill;

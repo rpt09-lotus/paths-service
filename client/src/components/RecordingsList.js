@@ -44,7 +44,7 @@ export default class RecordingsList extends React.Component {
         <div className={`${RecordingsListStyle.main}`}>
           <div className={`${RecordingsListStyle.nav} row`}>
             <div className='col-6'>
-              <button className='btn btn-light' onClick={this.showSubmissionForm}>
+              <button className={(this.state.submitFormVisible) ? 'btn btn-light' : 'btn btn-light'} onClick={this.showSubmissionForm}>
                 {
                   (!this.state.submitFormVisible ? (
                     <span><FontAwesomeIcon icon={faPlus} /> Add a recording</span>
@@ -64,6 +64,7 @@ export default class RecordingsList extends React.Component {
           </div>
           <SubmitForm
             visible={this.state.submitFormVisible}
+            serviceHosts={this.props.serviceHosts} 
           />
           { 
             this.state.recordings.map((recording, index) => (

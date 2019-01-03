@@ -1,0 +1,72 @@
+.submitForm {
+  min-height: 100px;
+  margin: 2rem 0;
+  animation: fadeIn 1s ease-in-out;
+  padding-bottom: 5rem;
+  border-bottom: 1px solid #d5d5d5;
+
+  .header {
+    margin-top: -2rem;
+  }
+
+  button,
+  select, 
+  .formInput {
+    margin-bottom: 1rem 0;
+  }
+
+  button {
+    margin-right: 1rem;
+  }
+
+
+  textarea {
+    margin: 1rem 0;
+    height: 150px;
+  }
+
+  label,
+  .formInput {
+    background-color: #f8f9fa;
+    border: none;
+  }
+
+  .ranking {
+    font-size: 1.5rem;
+    margin: 1rem 0;
+  }
+
+
+  .userInfo {
+    text-align: center;
+    font-size: 0.8rem;
+    .name {
+      color: #333;
+      margin: .5rem 0;
+    }
+
+    .joined {
+      color: #c0c0c0;
+      font-size: 0.8em;
+    }
+  }
+  .comment {
+    font-size: .9rem;
+    text-transform: capitalize;
+  }
+
+  .rightCol {
+    text-align: right;
+    padding-left: 2rem;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
