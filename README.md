@@ -17,6 +17,7 @@
     - [1.5.9. Dynamic routing](#159-dynamic-routing)
     - [1.5.10. Docker and Deployment](#1510-docker-and-deployment)
     - [1.5.11. NODE_ENV environment variable](#1511-node_env-environment-variable)
+    - [1.5.12. React Widget Development](#1512-react-widget-development)
 
 ## 1.1. Related Projects
 
@@ -29,19 +30,19 @@
 ## 1.2. To do
 
 ```
-- Phase 02
-  x Setup react env
-  x Setup proxy server 
-  x load my service and insert into dom
-  - load all other services and have insert into dom
-
-  - Have data change based on route
-    - how will scaffold get id ?
-  - Render basic map widget
-  - render basic recording widget
-
-- Save posts to database and upload xml file to S3
-  - when implemented, for tests make sure to remove a post after
+- Phase 03
+  - speed tests
+  - performance improvements
+    - use redis to cache images and gpx files
+    - lazyload n recordings at a time, refresh when get to botoom of page
+  - implement sorting method when clicking dropdown
+  - path widget buttons
+    - zoom to map, in interactive mode have a zoom extents thing
+    - interactive mode, by default loads static map. clicking interactive loads mapbox pannable version
+  - mobile version (for hoverable events?)
+- Stretch
+  - Save posts to database and upload xml file to S3
+    - when implemented, for tests make sure to remove a post after
 
 ```
 
@@ -63,13 +64,13 @@ Note: that those with an asterisk *(\*)* will have more detailed information , a
     - retrieves all recordings (excluding hero path) for a specified trail id. sort optionas as shown (optional!)
   - POST `/:trailId/recordings`
     - post a user path recording to a specified trail id.
-  - GET `/paths/:pathId?redividePath={null|{<number>}` * 
+  - GET `/paths/:pathId?redividePath={null|<number>}*` * 
     - retrieves detailed information about a path by a given ID in database. this also will retrieve gpx data. An additional parameter for gpxData will be given called `redividedPoints` if you provide redividePath query parameter. This will redistribute the points for a given amount i.e. `100` will return 100 points regardless of points in gpx file.
-  - GET `/paths/:pathId/image/:width/:height?mode={svg|png}`
+  - GET `/paths/:pathId/image/:width/:height?mode={svg|png}*`
     - renders static PNG/SVG map on server side given width and height. default: SVG.
-  - GET `/:trailId/heroPath` * 
+  - GET `/:trailId/heroPath?redividePath={null|<number>}*` * 
     - retrieves detailed information about the canonical path for a given trail data. this also will retrieve gpx data.  An additional parameter for gpxData will be given called `redividedPoints` if you provide redividePath query parameter. This will redistribute the points for a given amount i.e. `100` will return 100 points regardless of points in gpx file.
-  - GET `/:trailId/trailHead` * 
+  - GET `/:trailId/trailHead` 
     - retrieves first point of the canonical path for a given trail from the database if available.
 
 ### 1.3.2. Individual Component Page
@@ -405,9 +406,9 @@ app.get('/:trailId(\\d+$)*?', (req, res) => {
   {{/if}}
   <!-- DOM that -->
 
-  ```
+```
 
-### React Widget Development
+### 1.5.12. React Widget Development
 
 **Server Side Image Rendering**
 
@@ -427,3 +428,13 @@ Furthermore, one issue I had was the `map.fitBounds()` was not available for get
       ]
     }, ...
 ```
+
+This provides a PNG/SVG from a given endpoint.
+
+**Redivided path,SVG Geojson measuring with Turf.js + Interactive hoverable tooltips**
+
+I wanted to normalize the amount of elevation points for gpx data to be a consistent number. So if the path has `1000` or `304` or `50` points, I can specify to the endpoint `?redividePath=100` and always get a normalized data set of 100 points. To do this, I had to use a geojson utils library called [Turf.js](http://turfjs.org). This allowed me to measure the length of the polyline from the points, redivide into segments, and other useful things. I then drew the points, and elevation bars on the static image buffer (which also required to learn how to conver lat lng to px dimensions given bounds + zoom level)
+
+The result: A consistent elevation bar chart. After loading on client side, javascript callback sets up hoverable tooltips for more granular info like elevation change and miles into the trail.
+
+![example](https://i.imgur.com/ZKZw7MZr.png)
