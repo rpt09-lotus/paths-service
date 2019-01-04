@@ -17,6 +17,7 @@
     - [1.5.9. Dynamic routing](#159-dynamic-routing)
     - [1.5.10. Docker and Deployment](#1510-docker-and-deployment)
     - [1.5.11. NODE_ENV environment variable](#1511-node_env-environment-variable)
+    - [1.5.12. React Widget Development](#1512-react-widget-development)
 
 ## 1.1. Related Projects
 
@@ -29,19 +30,19 @@
 ## 1.2. To do
 
 ```
-- Phase 02
-  x Setup react env
-  x Setup proxy server 
-  x load my service and insert into dom
-  - load all other services and have insert into dom
-
-  - Have data change based on route
-    - how will scaffold get id ?
-  - Render basic map widget
-  - render basic recording widget
-
-- Save posts to database and upload xml file to S3
-  - when implemented, for tests make sure to remove a post after
+- Phase 03
+  - speed tests
+  - performance improvements
+    - use redis to cache images and gpx files
+    - lazyload n recordings at a time, refresh when get to botoom of page
+  - implement sorting method when clicking dropdown
+  - path widget buttons
+    - zoom to map, in interactive mode have a zoom extents thing
+    - interactive mode, by default loads static map. clicking interactive loads mapbox pannable version
+  - mobile version (for hoverable events?)
+- Stretch
+  - Save posts to database and upload xml file to S3
+    - when implemented, for tests make sure to remove a post after
 
 ```
 
@@ -63,11 +64,13 @@ Note: that those with an asterisk *(\*)* will have more detailed information , a
     - retrieves all recordings (excluding hero path) for a specified trail id. sort optionas as shown (optional!)
   - POST `/:trailId/recordings`
     - post a user path recording to a specified trail id.
-  - GET `/paths/:pathId` * 
-    - retrieves detailed information about a path by a given ID in database. this also will retrieve gpx data.
-  - GET `/:trailId/heroPath` * 
-    - retrieves detailed information about the canonical path for a given trail data. this also will retrieve gpx data.
-  - GET `/:trailId/trailHead` * 
+  - GET `/paths/:pathId?redividePath={null|<number>}*` * 
+    - retrieves detailed information about a path by a given ID in database. this also will retrieve gpx data. An additional parameter for gpxData will be given called `redividedPoints` if you provide redividePath query parameter. This will redistribute the points for a given amount i.e. `100` will return 100 points regardless of points in gpx file.
+  - GET `/paths/:pathId/image/:width/:height?mode={svg|png}*`
+    - renders static PNG/SVG map on server side given width and height. default: SVG.
+  - GET `/:trailId/heroPath?redividePath={null|<number>}*` * 
+    - retrieves detailed information about the canonical path for a given trail data. this also will retrieve gpx data.  An additional parameter for gpxData will be given called `redividedPoints` if you provide redividePath query parameter. This will redistribute the points for a given amount i.e. `100` will return 100 points regardless of points in gpx file.
+  - GET `/:trailId/trailHead` 
     - retrieves first point of the canonical path for a given trail from the database if available.
 
 ### 1.3.2. Individual Component Page
@@ -403,6 +406,35 @@ app.get('/:trailId(\\d+$)*?', (req, res) => {
   {{/if}}
   <!-- DOM that -->
 
-  ```
+```
 
+### 1.5.12. React Widget Development
 
+**Server Side Image Rendering**
+
+Moving back to react client development, I first was focused on Recording widget which comprised of all the user submitted paths. One concern was to be rendering all these mapbox widgets for every recording seemed too like it would be overkill / computationally expensive. Instead, similar to actual alltrails, it would make more sense to render a static map (as an image) for each recording on the server, and then show that instead. I managed to do this with 2 npm packages: `@mapbox/mapbox-gl-native`, a node native library which allows for the retrieval of the mapbox tiles and drawing geojson geometry, and than `sharp` for processing the buffers to image output. Then my endpoint  `/paths/:pathId/image/:width/:height` points to a dynamically rendered PNG image! [This tutorial](https://medium.com/@brendan_ward/creating-a-static-map-renderer-using-the-mapbox-gl-native-nodejs-api-23db560b219e) was very helpful in this endeavor, as well as the npm docs. 
+
+Furthermore, one issue I had was the `map.fitBounds()` was not available for getting the appropriate `zoom` value for the map in this version of mapbox.  this is very userful in client version as it will autozoom to your given lat lng bounds data, but with the node version I could only supply a number `zoom=0-24`, where 0 is the entire world, and 24 is the most zoomed in. Our trails tended to need to be zoomed anywhere from `8-13`, but I couldn't find a pattern to convert our bounds to this weird arbitrary `zoom` number. Then I found a google groups post that pretty much explained the logic behind google maps' zoom index, analagous to mapbox! With a few tweaks (aka a modifier to shrink / convert to mapbox zoom), voila, i was able to create this number from my bounds and pixel width/height! This can be seen in `staticMap.js`. Snippet.
+
+``` js
+  map.render({
+      width: width,
+      height: height,
+      zoom: staticMap.getBoundsZoomLevel(bounds, {width: width * modifier, height: height * modifier}),  
+      center: [ 
+        (Number(bounds.minlon) + Number(bounds.maxlon)) / 2,
+        (Number(bounds.minlat) + Number(bounds.maxlat)) / 2
+
+      ]
+    }, ...
+```
+
+This provides a PNG/SVG from a given endpoint.
+
+**Redivided path,SVG Geojson measuring with Turf.js + Interactive hoverable tooltips**
+
+I wanted to normalize the amount of elevation points for gpx data to be a consistent number. So if the path has `1000` or `304` or `50` points, I can specify to the endpoint `?redividePath=100` and always get a normalized data set of 100 points. To do this, I had to use a geojson utils library called [Turf.js](http://turfjs.org). This allowed me to measure the length of the polyline from the points, redivide into segments, and other useful things. I then drew the points, and elevation bars on the static image buffer (which also required to learn how to conver lat lng to px dimensions given bounds + zoom level)
+
+The result: A consistent elevation bar chart. After loading on client side, javascript callback sets up hoverable tooltips for more granular info like elevation change and miles into the trail.
+
+![example](https://i.imgur.com/ZKZw7MZr.png)

@@ -1,0 +1,38 @@
+.profile-image-wpr{
+  display: flex;
+  max-width: 75px;
+  margin: auto;
+  justify-content: center;
+
+  .default-image{
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+    background: url('https://s3.amazonaws.com/9trails-gpx/general/default.png');
+    border-radius: 50%;
+    background-position: center;
+    background-size: cover;
+    box-sizing: border-box;
+
+
+    .profile-image{
+      position: absolute;
+      opacity: 0;
+      top: 0;
+      left: 0;
+      width: 100%;
+      transition: opacity 1s ease-in-out;
+      background: #c0c0c0;
+      background-position: center;
+      background-size: cover;
+      border-radius: 50%;
+      padding-bottom: 100%;
+      
+      &.loaded {
+        opacity: 1;
+        background-position: center;
+        background-size: cover;
+      }
+    }
+  }
+}

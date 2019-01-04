@@ -1,5 +1,6 @@
 // ES6
 import ReactMapboxGl, { GeoJSONLayer, Marker } from 'react-mapbox-gl';
+import commonStyle from '../scss/_common.scss';
 
 const geoJSON = {
   'type': 'FeatureCollection',
@@ -40,7 +41,13 @@ export default class PathWidget extends React.Component {
   }
 
   componentDidMount() {
-    fetch(`${this.props.serviceHosts.paths}/${this.props.trailId}/heroPath`)
+    let url = '';
+    if (this.props.trailId) {
+      url = `${this.props.serviceHosts.paths}/${this.props.trailId}/heroPath`;
+    } else {
+      url = `${this.props.serviceHosts.paths}/paths/${this.props.pathId}`;
+    }
+    fetch(url)
       .then(response => {
         return response.json();
       })
@@ -81,7 +88,10 @@ export default class PathWidget extends React.Component {
         afterLayerId: 'geojson-1-line',
         'source': 'point',
         'paint': {
-          'circle-radius': 30,
+          'circle-radius': {
+            'base': 10,
+            'stops': [[1, 10], [24, 5]]
+          },
           'circle-opacity': 0.5,
           'circle-color': '#ff0000'
         }
@@ -112,7 +122,7 @@ export default class PathWidget extends React.Component {
       attributionControl: false
     });
 
-    return (this.state.loading) ? (<div className='loading'></div>) : (
+    return (this.state.loading) ? (<div className={commonStyle.loading}></div>) : (
       <Map
         style="mapbox://styles/cjm771/cjpjymsoc0nsz2slnpyrkxdol"
         onMouseMove={this.onMapHover}

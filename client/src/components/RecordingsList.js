@@ -1,13 +1,25 @@
-// ES6
+import commonStyle from '../scss/_common.scss';
+import RecordingsListStyle from '../scss/recordingsList.scss';
 import Recording from './Recording';
+import SubmitForm from './SubmitForm';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 export default class RecordingsList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       recordings: [],
-      loading: true
+      loading: true,
+      submitFormVisible: false
     };
+    this.showSubmissionForm = this.showSubmissionForm.bind(this);
+  }
+
+  showSubmissionForm() {
+    this.setState({
+      submitFormVisible: !this.state.submitFormVisible
+    });
   }
 
   componentDidMount() {
@@ -27,11 +39,39 @@ export default class RecordingsList extends React.Component {
   }
 
   render() {
-    return (this.state.loading) ? (<div className='loading'></div>) : (
-      !this.state.recordings.length ? (<div className='info'>No Recordings for this route.</div>) : (
-        this.state.recordings.map((recording, index) => (
-          <Recording key={index} recording={recording} />
-        ))
+    return (this.state.loading) ? (<div className={commonStyle.loading}></div>) : (
+      !this.state.recordings.length ? (<div className={commonStyle.info}>No Recordings for this route.</div>) : (
+        <div className={`${RecordingsListStyle.main}`}>
+          <div className={`${RecordingsListStyle.nav} row`}>
+            <div className='col-6'>
+              <button className={(this.state.submitFormVisible) ? 'btn btn-light' : 'btn btn-light'} onClick={this.showSubmissionForm}>
+                {
+                  (!this.state.submitFormVisible ? (
+                    <span><FontAwesomeIcon icon={faPlus} /> Add a recording</span>
+                  ) : <span><FontAwesomeIcon icon={faTimes} /> Cancel</span>
+                  )
+                }
+              </button>
+            </div>
+            <div className={`${RecordingsListStyle.rightCol} col-6`}>
+              <select className='form-control'>
+                <option value='date,desc'>Sort by: Newest First</option>
+                <option value='date,asc'>Sort by: Oldest First</option>
+                <option value='rating,desc'>Sort By: Highest Rated</option>
+                <option value='rating,asc'>Sort By: Lowest Rated</option>
+              </select>
+            </div>
+          </div>
+          <SubmitForm
+            visible={this.state.submitFormVisible}
+            serviceHosts={this.props.serviceHosts} 
+          />
+          { 
+            this.state.recordings.map((recording, index) => (
+              <Recording key={index} recording={recording} serviceHosts={this.props.serviceHosts} />
+            ))
+          }
+        </div>
       )
     );
   }

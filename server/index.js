@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const app = express();
 const cors = require('cors');
 const path = require('path');
+const staticMap = require('../services/staticMap.js');
+
 const PORT = process.env.PORT;
 
 app.use('/', express.static(__dirname + '/../client/'));
@@ -68,8 +70,19 @@ app.get('/paths', (req, res) => {
   });
 });
 
+app.get('/paths/:pathId/image/:width(\\d+)/:height(\\d+)', (req, res) => {
+  staticMap.renderStaticMap(req.params.pathId, req.params.width, req.params.height, true, req.query.mode).then((stream) => {
+    stream.pipe(res);
+  }).catch((err) => {
+    res.errorJSON(err.message || err);
+  });
+});
+
 app.get('/paths/:pathId', (req, res) => {
-  db.getPathById(req.params.pathId).then((result) => {
+  db.getPathById(
+    req.params.pathId,
+    req.query.redividePath
+  ).then((result) => {
     res.sendJSON(result);
   }).catch((error) => {
     res.errorJSON(`${error}`, 500);
@@ -109,7 +122,7 @@ app.post('/:trailId/recordings', (req, res) => {
 });
 
 app.get('/:trailId/heroPath',(req, res) => {
-  db.getHeroPathByTrailId(req.params.trailId).then((result) => {
+  db.getHeroPathByTrailId(req.params.trailId, req.query.redividePath).then((result) => {
     res.sendJSON(result);
   }).catch((error) => {
     res.errorJSON(`${error}`, 500);
