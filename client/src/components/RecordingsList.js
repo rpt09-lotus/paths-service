@@ -14,11 +14,18 @@ export default class RecordingsList extends React.Component {
       submitFormVisible: false
     };
     this.showSubmissionForm = this.showSubmissionForm.bind(this);
+    this.handleUserCancelledForm = this.handleUserCancelledForm.bind(this);
   }
 
   showSubmissionForm() {
     this.setState({
       submitFormVisible: !this.state.submitFormVisible
+    });
+  }
+
+  handleUserCancelledForm() {
+    this.setState({
+      submitFormVisible: false
     });
   }
 
@@ -65,6 +72,7 @@ export default class RecordingsList extends React.Component {
           <SubmitForm
             visible={this.state.submitFormVisible}
             serviceHosts={this.props.serviceHosts} 
+            onCancel={this.handleUserCancelledForm}
           />
           { 
             this.state.recordings.map((recording, index) => (
