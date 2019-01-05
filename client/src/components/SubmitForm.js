@@ -1,7 +1,6 @@
 import SubmitFormStyle from '../scss/submitForm.scss';
-import ProfilePic from './ProfilePic';
+import ProfileBadge from './ProfileBadge';
 import {getTrailIdFromUrl} from '../services/utils';
-import Moment from 'react-moment';
 import RankingStars from './RankingStars';
 
 export default class SubmitForm extends React.Component {
@@ -128,33 +127,14 @@ export default class SubmitForm extends React.Component {
     this.setState(newState);
   }
 
-  componentDidMount() {
-    fetch(`${this.props.serviceHosts.profile}/user/${getTrailIdFromUrl()}`).then((data) => {
-      return data.json();
-    }).then((resultObj) => {
-      this.setState({
-        user: resultObj.data.attributes
-      });
-    }).catch((error) => {
-      this.setError(`Error when fetching user: ${error}`);
-    });
-  }
-
   render() {
     return (!this.props.visible ? '' : (
       <div id='NT-pathService-submitForm' className={`${SubmitFormStyle.submitForm} row`}>
         <div className='col-2'>
-          <ProfilePic user={this.state.user} />
-          { !this.state.user ? '' : (
-            <div className={SubmitFormStyle.userInfo}>
-              <div className={SubmitFormStyle.name}>
-                {this.state.user.first_name} {this.state.user.pro ? <span className='badge badge-success'>Pro</span> : ''}
-              </div>
-              <div className={SubmitFormStyle.joined}>
-                joined <Moment fromNow ago>{this.state.user.date_joined}</Moment> ago
-              </div>
-            </div>
-          )}
+          <ProfileBadge 
+            userId={getTrailIdFromUrl()} 
+            serviceHosts={this.props.serviceHosts} 
+          />
         </div>
         <div className='col-10 row no-gutters'>
           <div className='col-8 form-group'>

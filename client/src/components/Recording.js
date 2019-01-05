@@ -1,6 +1,6 @@
 import Moment from 'react-moment';
 import recordingStyle from '../scss/recording.scss';
-import ProfilePic from './ProfilePic';
+import ProfileBadge from './ProfileBadge';
 import RankingStars from './RankingStars';
 import PathWidget from './PathWidget';
 import SVG from 'react-inlinesvg';
@@ -33,18 +33,7 @@ class Recording extends React.Component {
     });
     return shouldUpdate;
   }
-  componentDidMount() {
-    fetch(`${this.props.serviceHosts.profile}/user/${this.props.recording.user_id}`).then((data) => {
-      return data.json();
-    }).then((resultObj) => {
-      this.setState({
-        user: resultObj.data.attributes
-      });
-    }).catch((error) => {
-      console.log('Error when fetching user:', error);
-    });
-  }
-
+ 
   updateHoverStats(id) {
     const updateStats = () => {
       let stats = '';
@@ -173,18 +162,10 @@ class Recording extends React.Component {
     return (
       <div className={`row ${recordingStyle.recordingCard}`}>
         <div className='col-2'>
-          {/* {recording.user_id} */}
-          <ProfilePic user={this.state.user} />
-          { !this.state.user ? '' : (
-            <div className={recordingStyle.userInfo}>
-              <div className={recordingStyle.name}>
-                {this.state.user.first_name} {this.state.user.pro ? <span className='badge badge-success'>Pro</span> : ''}
-              </div>
-              <div className={recordingStyle.joined}>
-                joined <Moment fromNow ago>{this.state.user.date_joined}</Moment> ago
-              </div>
-            </div>
-          )}
+          <ProfileBadge 
+            userId={this.props.recording.user_id} 
+            serviceHosts={this.props.serviceHosts} 
+          />
         </div>
         <div className='col-10 row no-gutters'>
           <div className='col-8'>
