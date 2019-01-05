@@ -11,7 +11,7 @@ const PORT = process.env.PORT;
 
 app.use('/', express.static(__dirname + '/../client/'));
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb'}));
 app.use((req, res, next) => {
 
   console.log(`Incoming Request: ${req.method} ${req.url} `);

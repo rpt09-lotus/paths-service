@@ -9,6 +9,23 @@
     margin-top: -2rem;
   }
 
+
+  .successBox {
+    padding: 1rem;
+    background-color: #c7f2c9;
+    color: #016f1b;
+    margin-bottom: 1rem;
+    font-size: .8rem;
+  }
+
+  .errorBox {
+    padding: 1rem;
+    background-color: #fff4f4;
+    color: #ff0000;
+    margin-bottom: 1rem;
+    font-size: .8rem;
+  }
+
   button,
   select, 
   .formInput {

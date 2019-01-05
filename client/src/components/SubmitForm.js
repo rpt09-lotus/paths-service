@@ -3,27 +3,50 @@ import ProfilePic from './ProfilePic';
 import {getTrailIdFromUrl} from '../services/utils';
 import Moment from 'react-moment';
 import RankingStars from './RankingStars';
-import { faPray } from '@fortawesome/free-solid-svg-icons';
 
 export default class SubmitForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      error: null,
       user: null,
       comment: '',
       activity: '',
       gpxFile: '',
+      fileName: null,
       ranking: 0
     };
     this.onRankingChange = this.onRankingChange.bind(this);
+    this.resetForm = this.resetForm.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.setError = this.setError.bind(this);
+    this.getFields = this.getFields.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleFileChange = this.handleFileChange.bind(this);
   }
 
 
   onSubmit() {
-    console.log('current state: ', this.state);
+    return fetch(`${this.props.serviceHosts.paths}/${getTrailIdFromUrl()}/recordings`, {
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(this.getFields()), // body data type must match "Content-Type" header
+    })
+      .then((result) => {
+        return result.json();
+      })
+      .then((result) => {
+        if (result.error) {
+          throw result.error;
+        }
+        this.setError(null);
+        this.setSuccess('Successfully Posted! Although we\'re currently not saving anything to database');
+      })
+      .catch((error) => {
+        this.setError(`${error}`);
+      });
   }
 
   onRankingChange(index) {
@@ -32,9 +55,71 @@ export default class SubmitForm extends React.Component {
     });
   }
 
+  resetForm() {
+
+    document.querySelectorAll(
+      '#NT-pathService-submitForm input, ' +
+      '#NT-pathService-submitForm select, ' +
+      '#NT-pathService-submitForm textarea'
+    ).forEach((element) => {
+      element.value = '';
+    });
+
+    this.setState({
+      comment: '',
+      activity: '',
+      gpxFile: '',
+      fileName: null,
+      ranking: 0
+    });
+  }
+  
+  setSuccess(success) {
+    this.resetForm();
+    this.setState({
+      success: success
+    }, () => {
+      setTimeout(() => {
+        this.setState({
+          success: null
+        });
+      }, 5000);
+    });
+  }
+
+  setError(error) {
+    this.setState({
+      error
+    });
+  }
+
+  getFields() {
+    return {
+      user_id: getTrailIdFromUrl(),
+      date: JSON.stringify(new Date()),
+      ranking: this.state.ranking,
+      comment: this.state.comment,
+      gpx: this.state.gpxFile
+    };
+  }
+
+
+
   handleFileChange(e) {
-    // todo , get file contents
-    console.log('file Changed...');
+    const file = e.target.files[0];
+    if (file) {
+
+      const reader = new FileReader();
+      reader.readAsText(file, 'UTF-8');
+      reader.onload = (function (evt) {
+        this.setState({
+          fileName: file.name,
+          gpxFile: evt.target.result
+        });
+      }).bind(this);
+
+      reader.onerror = (function (evt) { this.setError('Error reading file'); }).bind(this);
+    }
   }
 
   handleInputChange(value, stateKey) {
@@ -51,13 +136,13 @@ export default class SubmitForm extends React.Component {
         user: resultObj.data.attributes
       });
     }).catch((error) => {
-      console.log('Error when fetching user:', error);
+      this.setError(`Error when fetching user: ${error}`);
     });
   }
 
   render() {
     return (!this.props.visible ? '' : (
-      <div className={`${SubmitFormStyle.submitForm} row`}>
+      <div id='NT-pathService-submitForm' className={`${SubmitFormStyle.submitForm} row`}>
         <div className='col-2'>
           <ProfilePic user={this.state.user} />
           { !this.state.user ? '' : (
@@ -74,9 +159,23 @@ export default class SubmitForm extends React.Component {
         <div className='col-10 row no-gutters'>
           <div className='col-8 form-group'>
             <h4 className={SubmitFormStyle.header}>Upload A Recording</h4>
+            {
+              this.state.error ? (
+                <div className={SubmitFormStyle.errorBox}>
+                  {this.state.error}
+                </div>  
+              ) : ''
+            }
+            {
+              this.state.success ? (
+                <div className={SubmitFormStyle.successBox}>
+                  {this.state.success}
+                </div>  
+              ) : ''
+            }
             <div className="custom-file">
-              <input type="file" onChange={this.handleFileChange} className="custom-file-input" id="customFile" />
-              <label className="custom-file-label" htmlFor="customFile">Choose file</label>
+              <input type="file" onChange={this.handleFileChange} accept=".gpx" className="custom-file-input" id="customFile" />
+              <label className="custom-file-label" htmlFor="customFile">{this.state.fileName || 'Choose gpx file..'}</label>
             </div>
             <textarea onChange={(e) => {this.handleInputChange(e.target.value, 'comment'); }} placeholder='Comment' className={`form-control ${SubmitFormStyle.formInput}`}>
             </textarea>
