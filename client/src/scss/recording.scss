@@ -32,46 +32,4 @@
   .staticMapWpr {
     margin-right: 0;
   }
-
-
-  .staticMap {
-    margin-top: 2rem;
-    position: relative;
-    width: 100%;
-    padding-right: 0;
-    min-height: 200px;
-    background: #f8f8f8;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-  
-    
-    &::before {
-      position: absolute;
-      content: url(https://s3.amazonaws.com/9trails-gpx/general/loading_spinner.gif);
-      transform: scale(.25);
-      display: block;
-    }
-
-    &.loaded {
-      background: none;
-      
-      &::before {
-        position: absolute;
-        content: '';
-      }
-    }
-
-    > span {
-      width: 100%;
-    }
-    
-    img,svg {
-      width: 100%;
-      height: auto;
-      z-index: 1;
-    }
-
-  }
 }

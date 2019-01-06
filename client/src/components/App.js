@@ -1,6 +1,6 @@
 import style from '../scss/style.scss';
 import {createNameSpace, getTrailIdFromUrl} from '../services/utils.js';
-import PathWidget from '../components/PathWidget';
+import DynamicMap from '../components/DynamicMap';
 import RecordingsList from './RecordingsList';
 
 // create namespaced object for storing my react elements
@@ -39,7 +39,7 @@ ns.CanonicalPath = class CanonicalPath extends React.Component {
 
   render() {
     return (
-      <PathWidget trailId={this.state.trailId} serviceHosts={SERVICE_HOSTS} />
+      <DynamicMap trailId={this.state.trailId} serviceHosts={SERVICE_HOSTS} />
     );
   }
     

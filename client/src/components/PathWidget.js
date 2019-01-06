@@ -1,153 +1,116 @@
-// ES6
-import ReactMapboxGl, { GeoJSONLayer, Marker } from 'react-mapbox-gl';
-import commonStyle from '../scss/_common.scss';
+import StaticMap from './StaticMap';
+import Tooltip from './Tooltip';
+import PathWidgetStyle from '../scss/pathWidget.scss';
 
-const geoJSON = {
-  'type': 'FeatureCollection',
-  'features': [
-    {
-      type: 'Feature',
-      properties: {},
-      geometry: {
-        type: 'LineString',
-        coordinates: []
-      }
-    }
-  ]
-};
+class PathWidget extends React.Component {
 
-var geoJSONPt = {
-  'type': 'FeatureCollection',
-  'features': [{
-    'type': 'Feature',
-    'geometry': {
-      'type': 'Point',
-      'coordinates': [0, 0]
-    }
-  }]
-};
-
-
-export default class PathWidget extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      geoJSON: null,
-      bounds: null,
-      geoJSONPt: [],
-      loading: true
+      tooltipContent: null
+    }
+    this.redividedPathCount = 100;
+    this.pathStats = null;
+    this.updateHoverStats = this.updateHoverStats.bind(this);
+    this.updateTooltipPosition = this.updateTooltipPosition.bind(this);
+    this.onStaticMapMouseOverPath = this.onStaticMapMouseOverPath.bind(this);
+    this.onStaticMapMouseOutPath = this.onStaticMapMouseOutPath.bind(this);
+  }
+
+  updateHoverStats(id) {
+    const updateStats = () => {
+      let stats = '';
+      const currentLocation = this.pathStats.gpx_data.redividedPoints[id];
+      stats += ((id / this.redividedPathCount) * this.pathStats.gpx_data.length.value).toFixed(2) + ' ' + this.pathStats.gpx_data.length.units;
+      const currElev = Math.round(currentLocation.ele * 3.28084);
+      const minElev = this.pathStats.gpx_data.min_max_elevation.value.min;
+      stats += '<br/>' + currElev + 'ft ( Δ' + Math.round(currElev - minElev) + ' ft)';
+      this.updateTooltipPosition(null, stats);
     };
-    this.onMapHover = this.onMapHover.bind(this);
-  }
-
-  componentDidMount() {
-    let url = '';
-    if (this.props.trailId) {
-      url = `${this.props.serviceHosts.paths}/${this.props.trailId}/heroPath`;
+    if (!this.pathStats) {
+      this.updateTooltipPosition(null, '<img style="width: 14px" src="https://s3.amazonaws.com/9trails-gpx/general/loading_spinner.gif" />');
+      fetch(`${this.props.serviceHosts.paths}/paths/${this.props.recording.id}?redividePath=${this.redividedPathCount}`).then((data) => {
+        return data.json();
+      }).then((resultObj) => {
+        this.pathStats = resultObj.data[0];
+        updateStats();
+      }).catch((error) => {
+        console.log('Error when fetching hover stats:', error);
+      });
     } else {
-      url = `${this.props.serviceHosts.paths}/paths/${this.props.pathId}`;
-    }
-    fetch(url)
-      .then(response => {
-        return response.json();
-      })
-      .then(json => {
-        const points = json.data[0].gpx_data.points.map(({ lat, lon }) => {
-          return [parseFloat(lon), parseFloat(lat)];
-        });
-        const bounds = json.data[0].gpx_data.bounds;
-
-        geoJSON.features[0].geometry.coordinates = points;
-        this.setState({
-          geoJSON,
-          loading: false,
-          bounds: [
-            [bounds.minlon, bounds.minlat],
-            [bounds.maxlon, bounds.maxlat]
-          ].map(group => {
-            return group.map(item => {
-              return parseFloat(item);
-            });
-          })
-        });
-      })
-      .catch(error => {
-        console.log('error', error);
-      });
-  }
-
-  onMapHover(map, e) {
-    if (!map.getSource('point')) {
-      map.addSource('point', {
-        'type': 'geojson',
-        'data': geoJSONPt
-      });
-      map.addLayer({
-        'id': 'hover_pt',
-        'type': 'circle',
-        afterLayerId: 'geojson-1-line',
-        'source': 'point',
-        'paint': {
-          'circle-radius': {
-            'base': 10,
-            'stops': [[1, 10], [24, 5]]
-          },
-          'circle-opacity': 0.5,
-          'circle-color': '#ff0000'
-        }
-      });
-      
-    }
-    map.moveLayer('geojson-1-line', 'hover_pt');
-    const lnglat = e.lngLat;
-    const tol = 4;
-    const geoJSONFeatures = map.queryRenderedFeatures([[e.point.x - tol, e.point.y - tol], [e.point.x + tol, e.point.y + tol]]).filter((feature) => {
-    
-      return (feature.source.toLowerCase().indexOf('geojson') !== -1);
-    });
-    if (geoJSONFeatures.length) {
-      const geoJSONFeature = geoJSONFeatures[0];
-      geoJSONPt.features[0].geometry.coordinates = [lnglat.lng, lnglat.lat];
-      map.getSource('point').setData(geoJSONPt);
-    } else {
-      geoJSONPt.features[0].geometry.coordinates = [];
-      map.getSource('point').setData(geoJSONPt);
+      updateStats();
     }
   }
   
-  render() {
-    const Map = ReactMapboxGl({
-      accessToken:
-        'pk.eyJ1IjoiY2ptNzcxIiwiYSI6ImNqOG92Z3YyYjA5Y3EzMnBjZTdoZnN0a3YifQ.7ff2wUzKItFMviEA60OcFA',
-      attributionControl: false
-    });
-
-    return (this.state.loading) ? (<div className={commonStyle.loading}></div>) : (
-      <Map
-        style="mapbox://styles/cjm771/cjpjymsoc0nsz2slnpyrkxdol"
-        onMouseMove={this.onMapHover}
-        onDataLoading={this.onDataLoading}
-        fitBounds={this.state.bounds}
-        fitBoundsOptions={{padding: 50}}
-        containerStyle={{
-          height: '400px',
-          width: '100%'
-        }}
-      >
-        <GeoJSONLayer
-          data={this.state.geoJSON}
-          lineLayout={{
-            'line-join': 'round',
-            'line-cap': 'round'
-          }}
-          linePaint={{
-            'line-color': '#888',
-            'line-width': 3
-          }}
-        />
-      </Map>
-    );
+  onStaticMapMouseOverPath(e, index, extraData) {
+    this.updateHoverStats(index);
+    this.updateTooltipPosition(e, this.state.tooltipContent);
   }
-}
 
-// in render()
+  onStaticMapMouseOutPath(e, index, extraData) {
+    this.updateTooltipPosition(null);
+  }
+  
+  
+  updateTooltipPosition(e, content) {
+    var cumulativeOffset = function(element) {
+      var top = 0;
+      var left = 0;
+      do {
+        top += element.offsetTop  || 0;
+        left += element.offsetLeft || 0;
+        element = element.offsetParent;
+      } while (element);
+  
+      return {
+        top: top,
+        left: left
+      };
+    };
+    const tooltip = document.getElementById('pathTooltip-' + this.props.recording.id);
+    if (content) {
+      tooltip.innerHTML = content;
+    }
+    if (e) {
+      const parent = document.getElementById('pathMap-' + this.props.recording.id);
+      const {top: parentTop, left: parentLeft} = cumulativeOffset(parent);
+      const parentWidth = parent.clientWidth;
+      const parentHeight = parent.clientHeight;
+      tooltip.style.left =
+          (e.pageX - parentLeft + tooltip.clientWidth + 10 < parentWidth)
+            ? (e.pageX - parentLeft + 10 + 'px')
+            : (parentWidth + 5 - tooltip.clientWidth + 'px');
+      tooltip.style.top =
+          (e.pageY - parentTop + tooltip.clientHeight + 10 < parentHeight)
+            ? (e.pageY - parentTop + 10 + 'px')
+            : (parentHeight + 5 - tooltip.clientHeight + 'px');
+      tooltip.style.display = 'block';
+      tooltip.style.opacity = 1;
+    } else {
+      tooltip.style.opacity = 0;
+      tooltip.style.display = 'none';
+    }
+  }
+
+  render() {
+    const {recording, serviceHosts} = this.props;
+
+    return (
+      <div className={`${PathWidgetStyle.mapWpr} col-12`}>
+        <Tooltip
+          id={recording.id}
+        />
+        <StaticMap
+          recording={recording}
+          serviceHosts={serviceHosts}
+          onMouseOverPath={this.onStaticMapMouseOverPath}
+          onMouseOutPath={this.onStaticMapMouseOutPath}
+        />
+      </div>
+    );
+    
+  }
+
+} 
+
+export default PathWidget;
