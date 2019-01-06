@@ -438,3 +438,14 @@ I wanted to normalize the amount of elevation points for gpx data to be a consis
 The result: A consistent elevation bar chart. After loading on client side, javascript callback sets up hoverable tooltips for more granular info like elevation change and miles into the trail.
 
 ![example](https://i.imgur.com/ZKZw7MZr.png)
+
+**Finalized Sorting and Form Submission**
+ The form submission is responsive and will submit to the backend. Currently it doesn't save but does validation on the server side.
+
+ ![submitForm](http://g.recordit.co/8nofqAmCUc.gif)
+
+**Finalized PathWidget**
+
+The finalized path widget (`pathWidget`)atually has both the image `staticMap` and interactive `dynamicMap`. Hovering over the map lets you toggle between the two! You can see it in action here. The form and page is also now mobile ready.
+
+![pathWidget](http://g.recordit.co/4K1ar9ptpN.gif)
