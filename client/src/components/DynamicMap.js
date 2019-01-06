@@ -3,7 +3,6 @@ import ReactMapboxGl, { GeoJSONLayer, Marker } from 'react-mapbox-gl';
 import commonStyle from '../scss/_common.scss';
 import DynamicMapStyle from '../scss/dynamicMap.scss';
 import pathUtils from '../../../services/pathUtils';
-import { debug } from 'util';
 
 const geoJSON = {
   'type': 'FeatureCollection',

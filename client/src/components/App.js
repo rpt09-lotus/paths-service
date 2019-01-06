@@ -17,12 +17,20 @@ if (process.env.NODE_ENV === 'production') {
     paths: 'http://ec2-54-172-80-40.compute-1.amazonaws.com',
   };
 } else {
+  const SAFE_ORIGINS = ['localhost', 'chris-m-2.local'];
+  let localHost = 'localhost';
+  SAFE_ORIGINS.forEach((host) => {
+    if (window.location.origin.indexOf(host) !== -1 ) {
+      localHost = host;
+    }
+  });
+
   SERVICE_HOSTS = {
-    trails: 'http://localhost:3001',
-    profile: 'http://localhost:3002',
-    photos: 'http://localhost:3003',
-    reviews: 'http://localhost:3004',
-    paths: 'http://localhost:3005',
+    trails: `http://${localHost}:3001`,
+    profile: `http:///${localHost}:3002`,
+    photos: `http:///${localHost}:3003`,
+    reviews: `http:///${localHost}:3004`,
+    paths: `http:///${localHost}:3005`,
   };
 }
 

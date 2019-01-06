@@ -72,12 +72,12 @@ class StaticMap extends React.Component {
       document.querySelectorAll(`#pathMap-${id} svg path`)[index].style.pointerEvents = 'all';
       const extraData = {el, elToShow, originalElStyle, originalElToShowStyle};
 
-      el.addEventListener('pointerover', (e) => {
+      el.addEventListener('mouseover', (e) => {
         this.onMouseOverPath(e, trueIndex, extraData);
         this.props.onMouseOverPath(e, trueIndex, extraData);
       });
 
-      el.addEventListener('pointerout', (e) => {
+      el.addEventListener('mouseout', (e) => {
         this.onMouseOutPath(e, trueIndex, extraData);
         this.props.onMouseOutPath(e, trueIndex, extraData);
       });
