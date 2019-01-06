@@ -100,6 +100,19 @@ const pathUtils = module.exports = {
     });
     return Object.assign({}, closestPoint);
   },
+  getClosestPointIndex: (targetPoint, points) => {
+    let minDist = 9999999;
+    let closestPointIndex = null;
+    let currDist;
+    points.forEach((pt, index) => {
+      currDist = distance(point(targetPoint), point(pathUtils.getPointAsArray(pt)));
+      if (currDist < minDist) {
+        minDist = currDist;
+        closestPointIndex = index;
+      }
+    });
+    return closestPointIndex;
+  },
   getPathLength: (points, opts = {}) => {
     const pts = pathUtils.getPointsAsArray(points);
     const path = lineString(pts, {name: 'path'});

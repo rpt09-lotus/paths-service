@@ -1,20 +1,28 @@
 import StaticMap from './StaticMap';
+import DynamicMap from './DynamicMap';
 import Tooltip from './Tooltip';
 import PathWidgetStyle from '../scss/pathWidget.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faExpand } from '@fortawesome/free-solid-svg-icons';
 
 class PathWidget extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      tooltipContent: null
-    }
+      dynamicMode: false,
+      tooltipContent: null,
+      zoomExtents: false
+    };
     this.redividedPathCount = 100;
     this.pathStats = null;
     this.updateHoverStats = this.updateHoverStats.bind(this);
+    this.changeMode = this.changeMode.bind(this);
     this.updateTooltipPosition = this.updateTooltipPosition.bind(this);
     this.onStaticMapMouseOverPath = this.onStaticMapMouseOverPath.bind(this);
     this.onStaticMapMouseOutPath = this.onStaticMapMouseOutPath.bind(this);
+    this.onDynamicMapMouseOverPath = this.onDynamicMapMouseOverPath.bind(this);
+    this.onDynamicMapMouseOutPath = this.onDynamicMapMouseOutPath.bind(this);
   }
 
   updateHoverStats(id) {
@@ -42,15 +50,37 @@ class PathWidget extends React.Component {
     }
   }
   
-  onStaticMapMouseOverPath(e, index, extraData) {
+  onStaticMapMouseOverPath(e, index) {
     this.updateHoverStats(index);
     this.updateTooltipPosition(e, this.state.tooltipContent);
   }
 
-  onStaticMapMouseOutPath(e, index, extraData) {
+  onStaticMapMouseOutPath(e) {
+    this.updateTooltipPosition(null);
+  }
+
+  onDynamicMapMouseOverPath(e, index) {
+    this.updateHoverStats(index);
+    this.updateTooltipPosition(e.originalEvent || e, this.state.tooltipContent);
+  }
+
+  onDynamicMapMouseOutPath(e) {
     this.updateTooltipPosition(null);
   }
   
+  
+  
+  zoomExtents() {
+    this.setState({
+      zoomExtents: Date.now()
+    });
+  }
+
+  changeMode(type) {
+    this.setState({
+      dynamicMode: (type === 'interactive') ? true : false
+    });
+  }
   
   updateTooltipPosition(e, content) {
     var cumulativeOffset = function(element) {
@@ -96,16 +126,41 @@ class PathWidget extends React.Component {
     const {recording, serviceHosts} = this.props;
 
     return (
-      <div className={`${PathWidgetStyle.mapWpr} col-12`}>
+      <div  id={`pathMap-${recording.id}`} className={`${PathWidgetStyle.mapWpr} col-12`}>
+        {
+          (!this.state.dynamicMode) ?
+            (
+              <div className={PathWidgetStyle.controls}>
+                <button onClick={() => { this.changeMode('interactive'); } }>Interactive</button>
+              </div>
+            ) : (
+              <div className={PathWidgetStyle.controls}>
+                <button onClick={() => { this.changeMode('static'); } }>Static</button>
+                <button onClick={() => { this.zoomExtents(); }}><FontAwesomeIcon icon={faExpand} /></button>
+              </div>
+            )
+        }
         <Tooltip
           id={recording.id}
         />
-        <StaticMap
-          recording={recording}
-          serviceHosts={serviceHosts}
-          onMouseOverPath={this.onStaticMapMouseOverPath}
-          onMouseOutPath={this.onStaticMapMouseOutPath}
-        />
+        {
+          (!this.state.dynamicMode) ? (
+            <StaticMap
+              recording={recording}
+              serviceHosts={serviceHosts}
+              onMouseOverPath={this.onStaticMapMouseOverPath}
+              onMouseOutPath={this.onStaticMapMouseOutPath}
+            /> ) : (
+            <DynamicMap
+              pathId={recording.id}
+              serviceHosts={serviceHosts}
+              setBounds={this.state.zoomExtents}
+              redividePathCount={this.redividedPathCount}
+              onMouseOverPath={this.onDynamicMapMouseOverPath}
+              onMouseOutPath={this.onDynamicMapMouseOutPath}
+            /> 
+          )
+        }
       </div>
     );
     
