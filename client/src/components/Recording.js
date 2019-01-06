@@ -44,10 +44,12 @@ class Recording extends React.Component {
               <Moment fromNow ago>{recording.date}</Moment> ago
             </div>
           </div>
-          <PathWidget
-            recording={recording}
-            serviceHosts={serviceHosts}
-          />
+          <div className={`col-12 no-gutters ${recordingStyle.pathWpr}`}>
+            <PathWidget
+              path={recording}
+              serviceHosts={serviceHosts}
+            />
+          </div>
         </div>
       </div>
     );

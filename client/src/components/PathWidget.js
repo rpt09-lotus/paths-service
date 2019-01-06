@@ -14,6 +14,7 @@ class PathWidget extends React.Component {
       tooltipContent: null,
       zoomExtents: false
     };
+    this.heightRatio = this.props.heightRatio || 0.35;
     this.redividedPathCount = 100;
     this.pathStats = null;
     this.updateHoverStats = this.updateHoverStats.bind(this);
@@ -37,7 +38,7 @@ class PathWidget extends React.Component {
     };
     if (!this.pathStats) {
       this.updateTooltipPosition(null, '<img style="width: 14px" src="https://s3.amazonaws.com/9trails-gpx/general/loading_spinner.gif" />');
-      fetch(`${this.props.serviceHosts.paths}/paths/${this.props.recording.id}?redividePath=${this.redividedPathCount}`).then((data) => {
+      fetch(`${this.props.serviceHosts.paths}/paths/${this.props.path.id}?redividePath=${this.redividedPathCount}`).then((data) => {
         return data.json();
       }).then((resultObj) => {
         this.pathStats = resultObj.data[0];
@@ -68,8 +69,6 @@ class PathWidget extends React.Component {
     this.updateTooltipPosition(null);
   }
   
-  
-  
   zoomExtents() {
     this.setState({
       zoomExtents: Date.now()
@@ -97,12 +96,12 @@ class PathWidget extends React.Component {
         left: left
       };
     };
-    const tooltip = document.getElementById('pathTooltip-' + this.props.recording.id);
+    const tooltip = document.getElementById('pathTooltip-' + this.props.path.id);
     if (content) {
       tooltip.innerHTML = content;
     }
     if (e) {
-      const parent = document.getElementById('pathMap-' + this.props.recording.id);
+      const parent = document.getElementById('pathMap-' + this.props.path.id);
       const {top: parentTop, left: parentLeft} = cumulativeOffset(parent);
       const parentWidth = parent.clientWidth;
       const parentHeight = parent.clientHeight;
@@ -123,10 +122,10 @@ class PathWidget extends React.Component {
   }
 
   render() {
-    const {recording, serviceHosts} = this.props;
+    const {path, serviceHosts} = this.props;
 
     return (
-      <div  id={`pathMap-${recording.id}`} className={`${PathWidgetStyle.mapWpr} col-12`}>
+      <div id={`pathMap-${path.id}`} className={`${PathWidgetStyle.mapWpr}`}>
         {
           (!this.state.dynamicMode) ?
             (
@@ -141,18 +140,20 @@ class PathWidget extends React.Component {
             )
         }
         <Tooltip
-          id={recording.id}
+          id={path.id}
         />
         {
           (!this.state.dynamicMode) ? (
             <StaticMap
-              recording={recording}
+              recording={path}
+              heightRatio={this.heightRatio}
               serviceHosts={serviceHosts}
               onMouseOverPath={this.onStaticMapMouseOverPath}
               onMouseOutPath={this.onStaticMapMouseOutPath}
             /> ) : (
             <DynamicMap
-              pathId={recording.id}
+              pathId={path.id}
+              heightRatio={this.heightRatio}
               serviceHosts={serviceHosts}
               setBounds={this.state.zoomExtents}
               redividePathCount={this.redividedPathCount}

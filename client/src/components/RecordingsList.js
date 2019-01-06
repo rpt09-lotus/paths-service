@@ -34,7 +34,6 @@ export default class RecordingsList extends React.Component {
   }
 
   fetchRecordings() {
-    console.log('fetching...');
     fetch(`${this.props.serviceHosts.paths}/${this.props.trailId}/recordings?sortBy=${this.state.sortBy}`)
       .then(response => {
         return response.json();

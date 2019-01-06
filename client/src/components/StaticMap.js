@@ -86,12 +86,14 @@ class StaticMap extends React.Component {
 
   render() {
     const {recording, serviceHosts} = this.props;
+    const width = 500;
+    const height = Math.floor((this.props.heightRatio || 0.35) * width);
     return (
       <div 
         className={`${staticMapStyle.staticMap} ${!this.state.loading ? staticMapStyle.loaded : ''}`}
       >
         <SVG
-          src={`${serviceHosts.paths}/paths/${recording.id}/image/500/200`}
+          src={`${serviceHosts.paths}/paths/${recording.id}/image/${width}/${height}`}
           onLoad={(src) => { setTimeout(() => { this.onSVGLoad(); }, 100); } }
         ></SVG>
       </div>

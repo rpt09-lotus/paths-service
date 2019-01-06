@@ -1,6 +1,8 @@
 .mapWpr {
+  position: relative;
+  display: flex;
+  width: 100%;
   margin-right: 0;
-  margin-top: 2rem;
 
   .controls {
     display: none;

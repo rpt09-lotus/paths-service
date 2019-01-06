@@ -192,7 +192,6 @@ export default class DynamicMap extends React.Component {
   }
 
   markTrailHead(pt) {
-    console.log('marking trailhead...pt;', pt);
     if (this.map) {
       if (!this.map.getSource('source_point_trailHead')) {
         this.map.addSource('source_point_trailHead', {
@@ -308,9 +307,10 @@ export default class DynamicMap extends React.Component {
         'pk.eyJ1IjoiY2ptNzcxIiwiYSI6ImNqOG92Z3YyYjA5Y3EzMnBjZTdoZnN0a3YifQ.7ff2wUzKItFMviEA60OcFA',
       attributionControl: false
     });
-
     return (this.state.loading) ? (<div className={commonStyle.loading}></div>) : (
-      <div className={DynamicMapStyle.dynMapWpr}>
+      <div className={DynamicMapStyle.dynMapWpr} style={{
+        paddingBottom: Math.floor((this.props.heightRatio || 0.35) * 100) + '%'
+      }}>
         <Map
           style="mapbox://styles/cjm771/cjpjymsoc0nsz2slnpyrkxdol"
           onMouseMove={this.onMapHover}
