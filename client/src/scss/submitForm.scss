@@ -1,3 +1,5 @@
+@import './_mediaQueries.scss';
+
 .submitForm {
   min-height: 100px;
   margin: 2rem 0;
@@ -78,10 +80,27 @@
     text-transform: capitalize;
   }
 
-  .rightCol {
-    text-align: right;
-    padding-left: 2rem;
+  .formArea {
+    // flex-direction: row;  
+    
   }
+
+  @include tablet {
+
+    .formArea {
+      // flex-direction: row-reverse;
+
+      .rightCol {
+        text-align: right;
+        float: right;
+        padding-left: 2rem;
+      }
+    }
+
+    
+  
+  }
+
 }
 
 @keyframes fadeIn {

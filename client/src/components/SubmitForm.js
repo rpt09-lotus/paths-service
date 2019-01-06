@@ -136,9 +136,12 @@ export default class SubmitForm extends React.Component {
             serviceHosts={this.props.serviceHosts} 
           />
         </div>
-        <div className='col-10 row no-gutters'>
-          <div className='col-8 form-group'>
+        <div className={`${SubmitFormStyle.formArea} col-10 row no-gutters`}>
+          <div className='col-12'>
             <h4 className={SubmitFormStyle.header}>Upload A Recording</h4>
+          </div>
+          {/* main column */}
+          <div className='col-12 col-sm-8'>
             {
               this.state.error ? (
                 <div className={SubmitFormStyle.errorBox}>
@@ -159,14 +162,9 @@ export default class SubmitForm extends React.Component {
             </div>
             <textarea onChange={(e) => {this.handleInputChange(e.target.value, 'comment'); }} placeholder='Comment' className={`form-control ${SubmitFormStyle.formInput}`}>
             </textarea>
-            <button onClick={this.onSubmit} className='btn btn-primary'>
-              Submit
-            </button>
-            <button onClick={this.props.onCancel} className='btn btn-danger'>
-              Cancel
-            </button>
           </div>
-          <div className={`col-4 ${SubmitFormStyle.rightCol}`}>
+          {/* right column */}
+          <div className={`col-12 col-sm-4 ${SubmitFormStyle.rightCol}`}>
             <select onChange={(e) => {this.handleInputChange(e.target.value, 'activity'); }} className={`form-control ${SubmitFormStyle.formInput}`}>
               {
                 ['Activity..','backpacking', 'birding', 'camping', 'cross-country-skiing', 
@@ -183,6 +181,15 @@ export default class SubmitForm extends React.Component {
                 interactive={true} 
                 onClick={this.onRankingChange} />
             </div>
+          </div>
+          {/* submit area */}
+          <div className='col-12'>
+            <button onClick={this.onSubmit} className='btn btn-primary'>
+              Submit
+            </button>
+            <button onClick={this.props.onCancel} className='btn btn-danger'>
+              Cancel
+            </button>
           </div>
         </div>
       </div>

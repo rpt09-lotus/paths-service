@@ -1,11 +1,17 @@
+@import './_mediaQueries.scss';
+
 .main {
   .nav {
     margin: 3rem 0;
+    
+    select,
+    button {
+      font-size: .75rem;
+    }
 
     .rightCol {
       text-align: right;
       
-
       select {
         float: right;
         max-width: 200px;
@@ -18,6 +24,13 @@
       }
   
 
+    }
+
+    @include tablet {
+      select,
+      button {
+        font-size: 1rem;
+      }  
     }
   }
 }
