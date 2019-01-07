@@ -1,4 +1,7 @@
-const {lineString, lineChunk, length, point, distance} = require('@turf/turf');
+const lineChunk = require('@turf/line-chunk');
+const length = require('@turf/length');
+const {point, lineString} = require('@turf/helpers');
+const distance = require('@turf/distance');
 
 const pathUtils = module.exports = {
 

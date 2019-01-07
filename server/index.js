@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const staticMap = require('../services/staticMap.js');
 
 const PORT = process.env.PORT;
@@ -56,7 +57,14 @@ app.get('/:trailId(\\d+$)*?', (req, res) => {
  ***********/
 
 app.get('/app.js', (req, res) => {
-  res.status(200).sendFile(path.resolve(__dirname + '/../client/dist/assets/app.bundle.js'));
+  let file = '/../client/dist/assets/app.bundle.js';
+  // if gzip is accepted  and we have it lets send that
+  if (req.acceptsEncoding().indexOf('gzip') !== -1 && fs.existsSync(path.resolve(__dirname + file + '.gz'))) {
+    file += '.gz';
+    res.set('Content-Encoding', 'gzip');
+  }
+  
+  res.status(200).sendFile(path.resolve(__dirname + file));
 });
 
 /************
