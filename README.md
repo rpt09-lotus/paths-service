@@ -323,11 +323,13 @@ $> yum install nodejs
 Then once doing that I made the following convenience `npm` scripts
 
   - `connect` - connects via ssh to ec2.
-  - `deploy` - deploys via rsync and ssh to ec2. looks at .gitignore and tracked files to know what to exclude / include!
-  - `dockerPrune` - clean up loose containers if any
+  - `copyToServer` - copies changes via rsync and ssh to ec2. looks at .gitignore and tracked files to know what to exclude / include!
+  - `deploy`- Magic one! deploys, stops docker instance if any, builds docker image, and runs it!
+  - `dockerPrune` - clean up loose containers if any..sometimes needed if run out of space by too many failed builds.
   - `dockerStop` - kills a running container (does lookup by image name), if any
   - `dockerBuild` - builds a d docker image
   - `dockerRun ` - runs a docker image, creating a new container instance
+  - `dbr` - build run combo!
 
 Below you can see what they look like:
 
@@ -335,12 +337,15 @@ Below you can see what they look like:
 
 ``` json
 {
-    "connect": "ssh -i ~/.ssh/mine2.pem  ec2-user@ec2-3-84-218-221.compute-1.amazonaws.com",
-    "deploy": "rsync --include .git --exclude-from=\"$(git -C . ls-files --exclude-standard -oi --directory >.git/ignores.tmp && echo .git/ignores.tmp)\" -rave \"ssh -i ~/.ssh/mine2.pem\" . ec2-user@ec2-3-84-218-221.compute-1.amazonaws.com:/home/ec2-user/app",
+
+    "connect": "ssh -i ~/.ssh/mine2.pem ec2-user@ec2-54-172-80-40.compute-1.amazonaws.com",
+    "copyToServer": "npm run build && scp -i \"~/.ssh/mine2.pem\" .env.production  ec2-user@ec2-54-172-80-40.compute-1.amazonaws.com:/home/ec2-user/app/.env && rsync --include .git --exclude-from=\"$(git -C . ls-files --exclude-standard -oi --directory >.git/ignores.tmp && echo .git/ignores.tmp)\" -rave \"ssh -i ~/.ssh/mine2.pem\" . ec2-user@ec2-54-172-80-40.compute-1.amazonaws.com:/home/ec2-user/app && npm run buildDev",
+    "deploy": "npm run copyToServer && ssh -i ~/.ssh/mine2.pem ec2-user@ec2-54-172-80-40.compute-1.amazonaws.com 'cd /home/ec2-user/app && ./buildRun.sh'",
     "dockerPrune": "docker system prune",
-    "dockerStop": "docker rm $(docker stop $(docker ps -a -q --filter ancestor=chris-proxy-service --format=\"{{.ID}}\"))",
-    "dockerBuild": "docker build --rm -t chris-proxy-service .",
-    "dockerRun": "docker run -p 80:80 chris-proxy-service"
+    "dockerStop": "docker rm $(docker stop $(docker ps -a -q --filter ancestor=9trails-paths --format=\"{{.ID}}\"))",
+    "dockerBuild": "docker build --rm -t 9trails-paths .",
+    "dockerRun": "docker run -p 80:80 9trails-paths",
+    "dbr": "npm run dockerBuild && npm run dockerRun"
 }
 ```
 
@@ -348,15 +353,8 @@ Below you can see what they look like:
 ``` sh
 # run deploy, this will send to ec2 instance
 $> npm run deploy
-# connect to ec2 and cd into app
-$> npm run connect
-$> cd app/
-[ec2] $> npm run dockerStop
-# stop docker
-[ec2] $> npm run dockeStop
-# build and run..i have  a short cut for both called dbr
-[ec2] $> npm run dbr
 ```
+
 ### 1.5.11. NODE_ENV environment variable
 
 TO know which host urls to use (`development` or `production`) the first thing we need to do is specify this in an *Environment Variable*. in node these can be accessed via the  `process.env` object.
