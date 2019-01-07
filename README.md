@@ -343,6 +343,20 @@ Below you can see what they look like:
     "dockerRun": "docker run -p 80:80 chris-proxy-service"
 }
 ```
+
+**To deploy**
+``` sh
+# run deploy, this will send to ec2 instance
+$> npm run deploy
+# connect to ec2 and cd into app
+$> npm run connect
+$> cd app/
+[ec2] $> npm run dockerStop
+# stop docker
+[ec2] $> npm run dockeStop
+# build and run..i have  a short cut for both called dbr
+[ec2] $> npm run dbr
+```
 ### 1.5.11. NODE_ENV environment variable
 
 TO know which host urls to use (`development` or `production`) the first thing we need to do is specify this in an *Environment Variable*. in node these can be accessed via the  `process.env` object.
@@ -449,3 +463,17 @@ The result: A consistent elevation bar chart. After loading on client side, java
 The finalized path widget (`pathWidget`)atually has both the image `staticMap` and interactive `dynamicMap`. Hovering over the map lets you toggle between the two! You can see it in action here. The form and page is also now mobile ready.
 
 ![pathWidget](http://g.recordit.co/4K1ar9ptpN.gif)
+
+### Performance 
+
+First thing was to look at my bundle. I like this tool here: https://chrisbateman.github.io/webpack-visualizer/. My bundle at the end of the day was around `2.2mb` (`3.1mb` in development). Mainly this is due to:
+
+  - react-mapbox-gl
+  - react-mapbox 
+  - turf
+  - moment 
+  - fortAwesome (fontAwesome Icons)
+
+![pathWidget](http://g.recordit.co/XRgEpCDXMs.gif)
+
+Unfortunately I couldn't really cut out these modules , except maybe fontawesome, but decided not too.

@@ -1,4 +1,5 @@
 const webpack = require('webpack');
+const dotenv = require('dotenv').config();
 
 module.exports = {
   entry: [
@@ -23,6 +24,11 @@ module.exports = {
       }
     ]
   },
+  plugins: [new webpack.DefinePlugin({
+    'process.env': {
+      NODE_ENV: '\'' + process.env.NODE_ENV + '\'',
+    },
+  })],
   resolve: {
     extensions: ['*', '.js', '.jsx']
   },
