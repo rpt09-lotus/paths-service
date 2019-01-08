@@ -1,5 +1,4 @@
 # 1. Paths Service
-
   - [1.2. To do](#12-to-do)
   - [1.3. Usage](#13-usage)
     - [1.3.1. API endpoints](#131-api-endpoints)
@@ -18,7 +17,8 @@
     - [1.5.10. Docker and Deployment](#1510-docker-and-deployment)
     - [1.5.11. NODE_ENV environment variable](#1511-node_env-environment-variable)
     - [1.5.12. React Widget Development](#1512-react-widget-development)
-
+    - [1.5.13. Performance](#1513-performance)
+    
 ## 1.1. Related Projects
 
   - paths: [Current]
@@ -30,15 +30,15 @@
 ## 1.2. To do
 
 ```
-- Phase 03
-  - speed tests
+  x speed tests
   - performance improvements
+    x other
     - use redis to cache images and gpx files
     - lazyload n recordings at a time, refresh when get to botoom of page
-  - implement sorting method when clicking dropdown
-  - path widget buttons
-    - zoom to map, in interactive mode have a zoom extents thing
-    - interactive mode, by default loads static map. clicking interactive loads mapbox pannable version
+  x implement sorting method when clicking dropdown
+  x path widget buttons
+    x zoom to map, in interactive mode have a zoom extents thing
+    x interactive mode, by default loads static map. clicking interactive loads mapbox pannable version
   - mobile version (for hoverable events?)
 - Stretch
   - Save posts to database and upload xml file to S3
@@ -323,11 +323,13 @@ $> yum install nodejs
 Then once doing that I made the following convenience `npm` scripts
 
   - `connect` - connects via ssh to ec2.
-  - `deploy` - deploys via rsync and ssh to ec2. looks at .gitignore and tracked files to know what to exclude / include!
-  - `dockerPrune` - clean up loose containers if any
+  - `copyToServer` - copies changes via rsync and ssh to ec2. looks at .gitignore and tracked files to know what to exclude / include!
+  - `deploy`- Magic one! deploys, stops docker instance if any, builds docker image, and runs it!
+  - `dockerPrune` - clean up loose containers if any..sometimes needed if run out of space by too many failed builds.
   - `dockerStop` - kills a running container (does lookup by image name), if any
   - `dockerBuild` - builds a d docker image
   - `dockerRun ` - runs a docker image, creating a new container instance
+  - `dbr` - build run combo!
 
 Below you can see what they look like:
 
@@ -335,14 +337,27 @@ Below you can see what they look like:
 
 ``` json
 {
-    "connect": "ssh -i ~/.ssh/mine2.pem  ec2-user@ec2-3-84-218-221.compute-1.amazonaws.com",
-    "deploy": "rsync --include .git --exclude-from=\"$(git -C . ls-files --exclude-standard -oi --directory >.git/ignores.tmp && echo .git/ignores.tmp)\" -rave \"ssh -i ~/.ssh/mine2.pem\" . ec2-user@ec2-3-84-218-221.compute-1.amazonaws.com:/home/ec2-user/app",
+
+    "connect": "ssh -i ~/.ssh/mine2.pem ec2-user@ec2-54-172-80-40.compute-1.amazonaws.com",
+    "copyToServer": "npm run build && scp -i \"~/.ssh/mine2.pem\" .env.production  ec2-user@ec2-54-172-80-40.compute-1.amazonaws.com:/home/ec2-user/app/.env && rsync --include .git --exclude-from=\"$(git -C . ls-files --exclude-standard -oi --directory >.git/ignores.tmp && echo .git/ignores.tmp)\" -rave \"ssh -i ~/.ssh/mine2.pem\" . ec2-user@ec2-54-172-80-40.compute-1.amazonaws.com:/home/ec2-user/app && npm run buildDev",
+    "deploy": "npm run copyToServer && ssh -i ~/.ssh/mine2.pem ec2-user@ec2-54-172-80-40.compute-1.amazonaws.com 'cd /home/ec2-user/app && ./buildRun.sh'",
     "dockerPrune": "docker system prune",
-    "dockerStop": "docker rm $(docker stop $(docker ps -a -q --filter ancestor=chris-proxy-service --format=\"{{.ID}}\"))",
-    "dockerBuild": "docker build --rm -t chris-proxy-service .",
-    "dockerRun": "docker run -p 80:80 chris-proxy-service"
+    "dockerStop": "docker rm $(docker stop $(docker ps -a -q --filter ancestor=9trails-paths --format=\"{{.ID}}\"))",
+    "dockerBuild": "docker build --rm -t 9trails-paths .",
+    "dockerRun": "docker run -p 80:80 9trails-paths",
+    "dbr": "npm run dockerBuild && npm run dockerRun"
 }
 ```
+
+**To deploy**
+``` sh
+# run deploy, this will send to ec2 instance
+$> npm run deploy
+```
+
+
+**NOTE**: (At end of react developent), I had to refactor my `Dockerfile` to have an `Ubuntu:16.04` base image and install node 8 and some additional from that. This is becuase some of my npm libs required some c++ env that the node image proved difficult to make happen!
+
 ### 1.5.11. NODE_ENV environment variable
 
 TO know which host urls to use (`development` or `production`) the first thing we need to do is specify this in an *Environment Variable*. in node these can be accessed via the  `process.env` object.
@@ -438,3 +453,91 @@ I wanted to normalize the amount of elevation points for gpx data to be a consis
 The result: A consistent elevation bar chart. After loading on client side, javascript callback sets up hoverable tooltips for more granular info like elevation change and miles into the trail.
 
 ![example](https://i.imgur.com/ZKZw7MZr.png)
+
+**Finalized Sorting and Form Submission**
+ The form submission is responsive and will submit to the backend. Currently it doesn't save but does validation on the server side.
+
+ ![submitForm](http://g.recordit.co/8nofqAmCUc.gif)
+
+**Finalized PathWidget**
+
+The finalized path widget (`pathWidget`)atually has both the image `staticMap` and interactive `dynamicMap`. Hovering over the map lets you toggle between the two! You can see it in action here. The form and page is also now mobile ready.
+
+![pathWidget](http://g.recordit.co/4K1ar9ptpN.gif)
+
+### 1.5.13. Performance 
+
+First thing was to look at my bundle. I like this tool here: https://chrisbateman.github.io/webpack-visualizer/. My bundle at the end of the day was around `2.2mb` (`3.1mb` in development). Mainly this is due to:
+
+  - react-mapbox-gl (`100kb`)
+  - react-mapbox (`500kb`)
+  - turf (`500 kb`)
+  - moment  (`500 kb`)
+  - fortAwesome (fontAwesome Icons) (`500 kb`)
+
+![performance original](http://g.recordit.co/XRgEpCDXMs.gif)
+
+**SCORE : 02 + 88, TIME TO OPTIMIZE** 
+
+![original](https://i.imgur.com/vrmqeru.jpg)
+
+Running this in page insights I got a SUPER LOW `2/100`. Ouch, ok lets try some performance improvements. The first thing insights mentioned was to serve a gzipped version , so I used the `CompressionPlugin`. This compresses a `.gz` version of app.js for compatible browsers. Cool, but we still need to serve it to those browsers on our server side so the route refactored for me was below. I basically checked if the req accepted gzip encoding , and if so would serve that with the content header!
+
+
+``` js
+
+
+app.get('/app.js', (req, res) => {
+  let file = '/../client/dist/assets/app.bundle.js';
+  // if gzip is accepted  and we have it lets send that
+  if (req.acceptsEncoding().indexOf('gzip') !== -1 && fs.existsSync(path.resolve(__dirname + file + '.gz'))) {
+    file += '.gz';
+    res.set('Content-Encoding', 'gzip');
+  }
+  
+  res.status(200).sendFile(path.resolve(__dirname + file));
+});
+```
+
+
+Then I turned to trying to reduce `turf` `moment` and `fort awesome` as I was using very little from those modules. Here I learned about this very useful `IgnorePlugin` for ignoring `moment` time locales! For the `turf` I learned I could individually import modules rather than from main lib i.e. `@turf/{util}`. 
+
+And for fortAwesome there is an interesting babel plugin called `babel-plugin-transform-imports` this essentially does the same thing that I did for turf, but converts it to the individual components for you! It was reccomended by fort awesome folks and looks like this below
+
+``` js
+use: {
+  loader: 'babel-loader',
+  query: {
+    plugins: [
+      [require('babel-plugin-transform-imports'), {
+        '@fortawesome/free-solid-svg-icons': {
+          'transform': '@fortawesome/free-solid-svg-icons/${member}',
+          'skipDefaultConversion': true
+        }
+      }]
+    ]
+  }
+}
+```
+
+**SCORE : 60 + 100, FROM 2.2MB to 254 kb** 
+
+![optimize](https://i.imgur.com/Yikh6J0.gif)
+
+From all of this I reduced the total uncompressed to *963kb* and compressed to **254kb**. NOT bad! Here is the summary
+
+  - react-mapbox-gl (`100kb`)
+  - react-mapbox (`500kb`)
+  - turf (500 kb -> `200 kb`)
+  - moment  (500 kb -> `80 kb`)
+  - fortAwesome (fontAwesome Icons) (500 kb -> `45 kb`)
+
+
+![performance original](http://g.recordit.co/PH63YaQ5xD.gif)
+
+**Other improvements**
+
+Other improvments which will probably help if I can get to them are:
+
+    - use redis to cache images and gpx files
+    - lazyload n recordings at a time, refresh when get to botoom of page

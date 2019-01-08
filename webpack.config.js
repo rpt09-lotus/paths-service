@@ -1,15 +1,30 @@
 const webpack = require('webpack');
+const dotenv = require('dotenv').config();
+const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
   entry: [
     './client/src/components/app.js'
   ],
+  devtool: false, 
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: ['babel-loader']
+        use: {
+          loader: 'babel-loader',
+          query: {
+            plugins: [
+              [require('babel-plugin-transform-imports'), {
+                '@fortawesome/free-solid-svg-icons': {
+                  'transform': '@fortawesome/free-solid-svg-icons/${member}',
+                  'skipDefaultConversion': true
+                }
+              }]
+            ]
+          }
+        }
       },
       {
         test: /\.(css|scss)$/,
@@ -23,6 +38,16 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': '"' + process.env.NODE_ENV + '"'
+    }),
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^\.\/locale$/,
+      contextRegExp: /moment$/
+    }),
+    new CompressionPlugin()
+  ],
   resolve: {
     extensions: ['*', '.js', '.jsx']
   },

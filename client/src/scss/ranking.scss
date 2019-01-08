@@ -1,13 +1,22 @@
 .ranking-wpr {
 
   .star {
-
-    color: rgb(129, 129, 129);
-    opacity: 0.3;
+    color: rgb(218, 217, 217);
+    opacity: 1;
     display: inline-block;
 
     &.filled {
+      color: rgb(129, 129, 129);
       opacity: 1;
+    }
+  }
+
+  &.interactive {
+    .star {
+      &:hover,
+      &.hovered {
+        color: #ed5a5a;
+      }
     }
   }
 

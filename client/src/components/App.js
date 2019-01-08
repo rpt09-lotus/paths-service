@@ -1,31 +1,11 @@
-import style from '../scss/style.scss';
-import {createNameSpace, getTrailIdFromUrl} from '../services/utils.js';
-import PathWidget from '../components/PathWidget';
+import {createNameSpace, getTrailIdFromUrl, getServiceHosts} from '../services/utils.js';
 import RecordingsList from './RecordingsList';
+import PathWidget from './PathWidget';
+import CommonStyle from '../scss/_common.scss';
 
 // create namespaced object for storing my react elements
 const ns = createNameSpace('NT.PathsService');
-
-let SERVICE_HOSTS = {};
-
-if (process.env.NODE_ENV === 'production') {
-  SERVICE_HOSTS = {
-    trails: 'http://trail-env.8jhbbn2nrv.us-west-2.elasticbeanstalk.com',
-    profile: 'http://profile-service.be6c6ztrma.us-west-2.elasticbeanstalk.com',
-    photos: 'http://trail-photos-service-dev.us-west-1.elasticbeanstalk.com',
-    reviews: 'http://trail-photos-service-dev.us-west-1.elasticbeanstalk.com',
-    paths: 'http://ec2-54-172-80-40.compute-1.amazonaws.com',
-  };
-} else {
-  SERVICE_HOSTS = {
-    trails: 'http://localhost:3001',
-    profile: 'http://localhost:3002',
-    photos: 'http://localhost:3003',
-    reviews: 'http://localhost:3004',
-    paths: 'http://localhost:3005',
-  };
-}
-
+const SERVICE_HOSTS = getServiceHosts();
 
 // canonical path react widget
 ns.CanonicalPath = class CanonicalPath extends React.Component {
@@ -33,16 +13,38 @@ ns.CanonicalPath = class CanonicalPath extends React.Component {
   constructor(props) {
     super();
     this.state = {
-      trailId: getTrailIdFromUrl()
+      loading: true,
+      trailId: getTrailIdFromUrl(),
+      pathData: null
     };
   }
 
+  componentDidMount() {
+    const url = `${SERVICE_HOSTS.paths}/${this.state.trailId}/heroPath`;
+    fetch(url)
+      .then(response => {
+        return response.json();
+      })
+      .then(json => {
+        this.setState({
+          pathData: json.data[0]
+        });
+      })
+      .catch(error => {
+        console.log('error', error);
+      });
+  }
+
+
   render() {
-    return (
-      <PathWidget trailId={this.state.trailId} serviceHosts={SERVICE_HOSTS} />
+    return (!this.state.pathData ? <div className={CommonStyle.loading}></div> :
+      <PathWidget 
+        heightRatio={0.75}
+        path={this.state.pathData} 
+        serviceHosts={SERVICE_HOSTS} 
+      />
     );
   }
-    
 };
 
 // recording widget

@@ -11,9 +11,14 @@ export default class RecordingsList extends React.Component {
     this.state = {
       recordings: [],
       loading: true,
+      sortBy: 'date,desc',
+
       submitFormVisible: false
     };
     this.showSubmissionForm = this.showSubmissionForm.bind(this);
+    this.handleUserCancelledForm = this.handleUserCancelledForm.bind(this);
+    this.handleSortByChange = this.handleSortByChange.bind(this);
+    this.fetchRecordings = this.fetchRecordings.bind(this);
   }
 
   showSubmissionForm() {
@@ -22,8 +27,14 @@ export default class RecordingsList extends React.Component {
     });
   }
 
-  componentDidMount() {
-    fetch(`${this.props.serviceHosts.paths}/${this.props.trailId}/recordings?sortBy=date,desc`)
+  handleUserCancelledForm() {
+    this.setState({
+      submitFormVisible: false
+    });
+  }
+
+  fetchRecordings() {
+    fetch(`${this.props.serviceHosts.paths}/${this.props.trailId}/recordings?sortBy=${this.state.sortBy}`)
       .then(response => {
         return response.json();
       })
@@ -36,6 +47,18 @@ export default class RecordingsList extends React.Component {
       .catch(error => {
         console.log('error', error);
       });
+  }
+
+  componentDidMount() {
+    this.fetchRecordings();
+  }
+
+  handleSortByChange(e) {
+    this.setState({
+      sortBy: e.target.value
+    },() => {
+      this.fetchRecordings();
+    });
   }
 
   render() {
@@ -54,7 +77,7 @@ export default class RecordingsList extends React.Component {
               </button>
             </div>
             <div className={`${RecordingsListStyle.rightCol} col-6`}>
-              <select className='form-control'>
+              <select onChange={this.handleSortByChange} className='form-control'>
                 <option value='date,desc'>Sort by: Newest First</option>
                 <option value='date,asc'>Sort by: Oldest First</option>
                 <option value='rating,desc'>Sort By: Highest Rated</option>
@@ -65,10 +88,11 @@ export default class RecordingsList extends React.Component {
           <SubmitForm
             visible={this.state.submitFormVisible}
             serviceHosts={this.props.serviceHosts} 
+            onCancel={this.handleUserCancelledForm}
           />
           { 
-            this.state.recordings.map((recording, index) => (
-              <Recording key={index} recording={recording} serviceHosts={this.props.serviceHosts} />
+            this.state.recordings.map((recording) => (
+              <Recording key={recording.id} recording={recording} serviceHosts={this.props.serviceHosts} />
             ))
           }
         </div>

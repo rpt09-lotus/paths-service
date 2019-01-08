@@ -1,4 +1,7 @@
-const {lineString, lineChunk, length, point, distance} = require('@turf/turf');
+const lineChunk = require('@turf/line-chunk');
+const length = require('@turf/length');
+const {point, lineString} = require('@turf/helpers');
+const distance = require('@turf/distance');
 
 const pathUtils = module.exports = {
 
@@ -99,6 +102,19 @@ const pathUtils = module.exports = {
       }
     });
     return Object.assign({}, closestPoint);
+  },
+  getClosestPointIndex: (targetPoint, points) => {
+    let minDist = 9999999;
+    let closestPointIndex = null;
+    let currDist;
+    points.forEach((pt, index) => {
+      currDist = distance(point(targetPoint), point(pathUtils.getPointAsArray(pt)));
+      if (currDist < minDist) {
+        minDist = currDist;
+        closestPointIndex = index;
+      }
+    });
+    return closestPointIndex;
   },
   getPathLength: (points, opts = {}) => {
     const pts = pathUtils.getPointsAsArray(points);

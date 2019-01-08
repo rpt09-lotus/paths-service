@@ -1,3 +1,5 @@
+@import './_mediaQueries.scss';
+
 .submitForm {
   min-height: 100px;
   margin: 2rem 0;
@@ -9,10 +11,33 @@
     margin-top: -2rem;
   }
 
+
+  .successBox {
+    padding: 1rem;
+    background-color: #c7f2c9;
+    color: #016f1b;
+    margin-bottom: 1rem;
+    font-size: .8rem;
+  }
+
+  .errorBox {
+    padding: 1rem;
+    background-color: #fff4f4;
+    color: #ff0000;
+    margin-bottom: 1rem;
+    font-size: .8rem;
+  }
+
   button,
   select, 
   .formInput {
     margin-bottom: 1rem 0;
+  }
+
+  select {
+    background: #f8f9fa url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") no-repeat right .75rem center;
+    background-size: 8px 10px;
+    -webkit-appearance:none;
   }
 
   button {
@@ -32,7 +57,7 @@
   }
 
   .ranking {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     margin: 1rem 0;
   }
 
@@ -55,10 +80,27 @@
     text-transform: capitalize;
   }
 
-  .rightCol {
-    text-align: right;
-    padding-left: 2rem;
+  .formArea {
+    // flex-direction: row;  
+    
   }
+
+  @include tablet {
+
+    .formArea {
+      // flex-direction: row-reverse;
+
+      .rightCol {
+        text-align: right;
+        float: right;
+        padding-left: 2rem;
+      }
+    }
+
+    
+  
+  }
+
 }
 
 @keyframes fadeIn {

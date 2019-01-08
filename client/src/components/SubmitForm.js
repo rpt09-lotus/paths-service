@@ -1,76 +1,195 @@
 import SubmitFormStyle from '../scss/submitForm.scss';
-import ProfilePic from './ProfilePic';
+import ProfileBadge from './ProfileBadge';
 import {getTrailIdFromUrl} from '../services/utils';
-import Moment from 'react-moment';
 import RankingStars from './RankingStars';
-import { faPray } from '@fortawesome/free-solid-svg-icons';
 
 export default class SubmitForm extends React.Component {
   constructor(props) {
     super(props);
-    this.state  = {
-      user: null
+    this.state = {
+      error: null,
+      user: null,
+      comment: '',
+      activity: '',
+      gpxFile: '',
+      fileName: null,
+      ranking: 0
+    };
+    this.onRankingChange = this.onRankingChange.bind(this);
+    this.resetForm = this.resetForm.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
+    this.setError = this.setError.bind(this);
+    this.getFields = this.getFields.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleFileChange = this.handleFileChange.bind(this);
+  }
+
+
+  onSubmit() {
+    return fetch(`${this.props.serviceHosts.paths}/${getTrailIdFromUrl()}/recordings`, {
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(this.getFields()), // body data type must match "Content-Type" header
+    })
+      .then((result) => {
+        return result.json();
+      })
+      .then((result) => {
+        if (result.error) {
+          throw result.error;
+        }
+        this.setError(null);
+        this.setSuccess('Successfully Posted! Although we\'re currently not saving anything to database');
+      })
+      .catch((error) => {
+        this.setError(`${error}`);
+      });
+  }
+
+  onRankingChange(index) {
+    this.setState({
+      ranking: (index === this.state.ranking - 1) ? 0 : index + 1
+    });
+  }
+
+  resetForm() {
+
+    document.querySelectorAll(
+      '#NT-pathService-submitForm input, ' +
+      '#NT-pathService-submitForm select, ' +
+      '#NT-pathService-submitForm textarea'
+    ).forEach((element) => {
+      element.value = '';
+    });
+
+    this.setState({
+      comment: '',
+      activity: '',
+      gpxFile: '',
+      fileName: null,
+      ranking: 0
+    });
+  }
+  
+  setSuccess(success) {
+    this.resetForm();
+    this.setState({
+      success: success
+    }, () => {
+      setTimeout(() => {
+        this.setState({
+          success: null
+        });
+      }, 5000);
+    });
+  }
+
+  setError(error) {
+    this.setState({
+      error
+    });
+  }
+
+  getFields() {
+    return {
+      user_id: getTrailIdFromUrl(),
+      date: JSON.stringify(new Date()),
+      ranking: this.state.ranking,
+      comment: this.state.comment,
+      gpx: this.state.gpxFile
     };
   }
 
-  componentDidMount() {
-    fetch(`${this.props.serviceHosts.profile}/user/${getTrailIdFromUrl()}`).then((data) => {
-      return data.json();
-    }).then((resultObj) => {
-      this.setState({
-        user: resultObj.data.attributes
-      });
-    }).catch((error) => {
-      console.log('Error when fetching user:', error);
-    });
+
+
+  handleFileChange(e) {
+    const file = e.target.files[0];
+    if (file) {
+
+      const reader = new FileReader();
+      reader.readAsText(file, 'UTF-8');
+      reader.onload = (function (evt) {
+        this.setState({
+          fileName: file.name,
+          gpxFile: evt.target.result
+        });
+      }).bind(this);
+
+      reader.onerror = (function (evt) { this.setError('Error reading file'); }).bind(this);
+    }
+  }
+
+  handleInputChange(value, stateKey) {
+    const newState = {};
+    newState[stateKey] = value;
+    this.setState(newState);
   }
 
   render() {
     return (!this.props.visible ? '' : (
-      <div className={`${SubmitFormStyle.submitForm} row`}>
+      <div id='NT-pathService-submitForm' className={`${SubmitFormStyle.submitForm} row`}>
         <div className='col-2'>
-          <ProfilePic user={this.state.user} />
-          { !this.state.user ? '' : (
-            <div className={SubmitFormStyle.userInfo}>
-              <div className={SubmitFormStyle.name}>
-                {this.state.user.first_name} {this.state.user.pro ? <span className='badge badge-success'>Pro</span> : ''}
-              </div>
-              <div className={SubmitFormStyle.joined}>
-                joined <Moment fromNow ago>{this.state.user.date_joined}</Moment> ago
-              </div>
-            </div>
-          )}
+          <ProfileBadge 
+            userId={getTrailIdFromUrl()} 
+            serviceHosts={this.props.serviceHosts} 
+          />
         </div>
-        <div className='col-10 row no-gutters'>
-          <div className='col-8 form-group'>
+        <div className={`${SubmitFormStyle.formArea} col-10 row no-gutters`}>
+          <div className='col-12'>
             <h4 className={SubmitFormStyle.header}>Upload A Recording</h4>
-            <div className="custom-file">
-              <input type="file" className="custom-file-input" id="customFile" />
-              <label className="custom-file-label" for="customFile">Choose file</label>
-            </div>
-            <textarea placeholder='Comment' className={`form-control ${SubmitFormStyle.formInput}`}>
-            </textarea>
-            <button className='btn btn-primary'>
-              Submit
-            </button>
-            <button className='btn btn-danger'>
-              Cancel
-            </button>
           </div>
-          <div className={`col-4 ${SubmitFormStyle.rightCol}`}>
-            <select className={`form-control ${SubmitFormStyle.formInput}`}>
+          {/* main column */}
+          <div className='col-12 col-sm-8'>
+            {
+              this.state.error ? (
+                <div className={SubmitFormStyle.errorBox}>
+                  {this.state.error}
+                </div>  
+              ) : ''
+            }
+            {
+              this.state.success ? (
+                <div className={SubmitFormStyle.successBox}>
+                  {this.state.success}
+                </div>  
+              ) : ''
+            }
+            <div className="custom-file">
+              <input type="file" onChange={this.handleFileChange} accept=".gpx" className="custom-file-input" id="customFile" />
+              <label className="custom-file-label" htmlFor="customFile">{this.state.fileName || 'Choose gpx file..'}</label>
+            </div>
+            <textarea onChange={(e) => {this.handleInputChange(e.target.value, 'comment'); }} placeholder='Comment' className={`form-control ${SubmitFormStyle.formInput}`}>
+            </textarea>
+          </div>
+          {/* right column */}
+          <div className={`col-12 col-sm-4 ${SubmitFormStyle.rightCol}`}>
+            <select onChange={(e) => {this.handleInputChange(e.target.value, 'activity'); }} className={`form-control ${SubmitFormStyle.formInput}`}>
               {
                 ['Activity..','backpacking', 'birding', 'camping', 'cross-country-skiing', 
                   'fishing', 'hiking', 'horseback-riding', 'mountain-biking', 'nature-trips', 
                   'off-road-driving', 'paddle-sports', 'road-biking', 'rock-climbing', 'scenic-driving', 
                   'snowshoeing', 'skiing', 'surfing', 'trail-running', 'walking'].map((item, index) => {
-                  return (<option key={index} value={item}>{item}</option>);
+                  return (<option key={index} value={(item === 'Activity..') ? '' : item}>{item}</option>);
                 })
               }
             </select>
             <div className={SubmitFormStyle.ranking}>
-              <RankingStars ranking={0} />
+              <RankingStars 
+                ranking={this.state.ranking} 
+                interactive={true} 
+                onClick={this.onRankingChange} />
             </div>
+          </div>
+          {/* submit area */}
+          <div className='col-12'>
+            <button onClick={this.onSubmit} className='btn btn-primary'>
+              Submit
+            </button>
+            <button onClick={this.props.onCancel} className='btn btn-danger'>
+              Cancel
+            </button>
           </div>
         </div>
       </div>

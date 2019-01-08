@@ -1,0 +1,27 @@
+.dynMapWpr {
+  width: 100%;
+  position: relative;
+
+
+  .barChart {
+    position: absolute;
+    z-index: 4;
+    height: 20%;
+    width: 100%;
+    bottom: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    .bar {
+      background: #333;
+      opacity: 0.25;
+
+      &.hover {
+        background: #ff0000;
+        opacity: 1.0;
+      }
+
+    }
+  }
+}
