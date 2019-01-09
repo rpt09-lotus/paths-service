@@ -22,7 +22,8 @@ RUN apt-get update \
   && sudo apt-get install -y build-essential \
   && sudo apt-get install -y libgles2-mesa-dev \
   && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
-  && apt-get -y install nodejs
+  && apt-get -y install nodejs \
+  && apt-get -y install xvfb
 
 # install npm
 ENV NODE_ENV=production
@@ -31,7 +32,10 @@ ENV LD_PRELOAD='/app/node_modules/sharp/vendor/lib/libz.so'
 #expose pg + node
 EXPOSE 80 5432
 # run our shell script
-CMD /etc/init.d/postgresql start \
+CMD start-stop-daemon --start --pidfile ~/xvfb.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1024x768x24 -ac +extension GLX +render -noreset \
+&& sleep 5 \
+&& export DISPLAY=:99.0 \
+&&/etc/init.d/postgresql start \
 && sudo -u postgres psql --command "CREATE USER docker WITH SUPERUSER PASSWORD 'docker';" \
 && sudo -u postgres createdb -O docker 9trails-paths \
 && sudo PGPASSWORD='docker' -u postgres psql -d 9trails-paths -U docker -h 127.0.0.1 -p 5432 < db/schema.sql \
