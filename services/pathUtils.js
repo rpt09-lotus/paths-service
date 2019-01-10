@@ -90,10 +90,12 @@ const pathUtils = module.exports = {
     return [$x, $y];
 
   },
+
   getClosestPoint: (targetPoint, points) => {
     let minDist = 9999999;
     let closestPoint = null;
     let currDist;
+    debugger;
     points.forEach(pt => {
       currDist = distance(point(targetPoint), point(pathUtils.getPointAsArray(pt)));
       if (currDist < minDist) {
@@ -108,7 +110,8 @@ const pathUtils = module.exports = {
     let closestPointIndex = null;
     let currDist;
     points.forEach((pt, index) => {
-      currDist = distance(point(targetPoint), point(pathUtils.getPointAsArray(pt)));
+      const distancePoly = distance.default || distance;
+      currDist = distancePoly(point(targetPoint), point(pathUtils.getPointAsArray(pt)));
       if (currDist < minDist) {
         minDist = currDist;
         closestPointIndex = index;
