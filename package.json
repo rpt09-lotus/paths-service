@@ -43,6 +43,7 @@
     "react": "~16.5.2",
     "react-dom": "~16.5.2",
     "react-inlinesvg": "^0.8.3",
+    "react-lazy-fastdom": "^4.1.0",
     "react-mapbox-gl": "~3.9.2",
     "react-moment": "^0.8.4",
     "request": "^2.88.0",

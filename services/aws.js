@@ -13,6 +13,7 @@ module.exports = {
     })
   },
   parseGPX: async function(xml) {
+    console.log('parsing gpx..');
     let json = xml2json.toJson(xml);
     json = JSON.parse(json);
     if (json.gpx && json.gpx.metadata && json.gpx.metadata.bounds ) {
@@ -31,8 +32,9 @@ module.exports = {
           points = gpx.trk.trkseg.trkpt;
         }
       } else {
-        throw 'Could not find points of gpx file!'
+        throw 'Could not find points of gpx file!';
       }
+      console.log('finished parsing...');
       return {
         bounds: gpx.metadata.bounds,
         points: points

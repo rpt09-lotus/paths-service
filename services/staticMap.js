@@ -17,7 +17,7 @@ const staticMap = module.exports = {
     return stream;
   },
   renderStaticMap: (pathId, width = 800, height = 300, drawChart = true, mode = 'svg') => {
-
+    console.log('rendering starting now..');
     const modifier = 0.45;
     return db.getPathById(pathId).then((result) => {
       width = Number(width);
@@ -126,7 +126,8 @@ const staticMap = module.exports = {
               channels: 4
             }
           });
-        
+          
+          console.log('creating image buffer');
           return image.png().toBuffer()
             .then ( (buffer) => {
               if (drawChart) {

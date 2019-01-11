@@ -2,8 +2,10 @@ import commonStyle from '../scss/_common.scss';
 import RecordingsListStyle from '../scss/recordingsList.scss';
 import Recording from './Recording';
 import SubmitForm from './SubmitForm';
+import LazyLoad from 'react-lazy-fastdom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
+
 
 export default class RecordingsList extends React.Component {
   constructor(props) {
@@ -42,6 +44,9 @@ export default class RecordingsList extends React.Component {
         this.setState({
           recordings: json.data,
           loading: false
+        }, () => {
+          // trigger dat.
+          window.scrollTo(window.scrollX, window.scrollY + 1);
         });
       })
       .catch(error => {
@@ -90,9 +95,15 @@ export default class RecordingsList extends React.Component {
             serviceHosts={this.props.serviceHosts} 
             onCancel={this.handleUserCancelledForm}
           />
+       
+          
           { 
             this.state.recordings.map((recording) => (
-              <Recording key={recording.id} recording={recording} serviceHosts={this.props.serviceHosts} />
+              <div key={recording.id}  style={{'minHeight': '100px'}}>
+                <LazyLoad height={'100%'} offsetTop={600} debounce={false}>
+                  <Recording recording={recording} serviceHosts={this.props.serviceHosts} />
+                </LazyLoad>
+              </div>
             ))
           }
         </div>
