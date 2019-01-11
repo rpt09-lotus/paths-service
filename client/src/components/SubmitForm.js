@@ -141,7 +141,7 @@ export default class SubmitForm extends React.Component {
             <h4 className={SubmitFormStyle.header}>Upload A Recording</h4>
           </div>
           {/* main column */}
-          <div className='col-12 col-sm-8'>
+          <div className='col-12 col-lg-8'>
             {
               this.state.error ? (
                 <div className={SubmitFormStyle.errorBox}>
@@ -164,7 +164,7 @@ export default class SubmitForm extends React.Component {
             </textarea>
           </div>
           {/* right column */}
-          <div className={`col-12 col-sm-4 ${SubmitFormStyle.rightCol}`}>
+          <div className={`col-12 col-lg-4 ${SubmitFormStyle.rightCol}`}>
             <select onChange={(e) => {this.handleInputChange(e.target.value, 'activity'); }} className={`form-control ${SubmitFormStyle.formInput}`}>
               {
                 ['Activity..','backpacking', 'birding', 'camping', 'cross-country-skiing', 

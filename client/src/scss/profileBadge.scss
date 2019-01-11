@@ -3,6 +3,10 @@
   font-size: 0.8rem;
   .name {
     color: #333;
+    display: inline-block;
+    text-overflow: ellipsis;
+    width: 100%;
+    overflow: hidden;
     margin: .5rem 0;
   }
 

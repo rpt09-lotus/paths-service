@@ -2,11 +2,16 @@
   min-height: 100px;
   margin: 2rem 0;
 
+
   .userInfo {
     text-align: center;
     font-size: 0.8rem;
     .name {
       color: #333;
+      display: inline-block;
+      text-overflow: ellipsis;
+      width: 100%;
+      overflow: hidden;
       margin: .5rem 0;
     }
 
