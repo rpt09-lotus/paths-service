@@ -1,4 +1,5 @@
-# 1. Paths Service
+# 1. Paths Service TOC
+
   - [1.2. To do](#12-to-do)
   - [1.3. Usage](#13-usage)
     - [1.3.1. API endpoints](#131-api-endpoints)
@@ -33,8 +34,8 @@
   x speed tests
   - performance improvements
     x other
-    - use redis to cache images and gpx files
-    - lazyload n recordings at a time, refresh when get to botoom of page
+    -  cache images 
+    x lazyload n recordings at a time, refresh when get to botoom of page
   x implement sorting method when clicking dropdown
   x path widget buttons
     x zoom to map, in interactive mode have a zoom extents thing
@@ -49,6 +50,19 @@
 
 
 ## 1.3. Usage 
+
+
+Path Service is a series of endpoints and 2 widgets for 9 trails. The service contains a db for storing info about paths, as well as links to gpx files (xml files) stored on s3. It uses these files which contain lat, long, and elev data to render static/interactive maps. 
+
+**path widget**
+
+![upload](https://camo.githubusercontent.com/b9196696a983a2e944ac85e30278a5845ff185e4/687474703a2f2f672e7265636f726469742e636f2f344b316172397074704e2e676966)
+
+**uploading a user recording**
+
+![upload](https://camo.githubusercontent.com/9be7f8dcfe2ff6ccc074c51c7d98567ee4668386/687474703a2f2f672e7265636f726469742e636f2f386e6f6671416d4355632e676966)
+
+
 
 ### 1.3.1. API endpoints
 
@@ -82,9 +96,15 @@ Going to `GET /` aka the root server page, will render the individual components
 This service uses the following dev stack:
 
   - Server: node / NPM
+  - Deployment: docker on ec2 aws
   - Client: react
   - DB: PostgreSQL (installed via brew)
   - Testing: jest
+
+  - Important Libs:
+    - mapbox-gl-react
+    - mapbox-gl-node (static map rendering)
+    - canvas / sharp (image processing)
 
 
 If you don't have PostgreSQL,It can be installed with brew. If you choose not to use brew or are using linux , please see this [article](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-18-04) on postgres installation
@@ -535,9 +555,22 @@ From all of this I reduced the total uncompressed to *963kb* and compressed to *
 
 ![performance original](http://g.recordit.co/PH63YaQ5xD.gif)
 
+** Lazy loading recordings **
+
+I noticed that even if its not visible on DOM, or not scrolled to yet, react will attempt to render all the widgets. Thanks to [react-lazy-fastdom](https://www.npmjs.com/package/react-lazy-fastdom), it solves these two issues. Below you can see I just wrapped with this component, and will only load when visible and at scroll place. It requires a min height, but you can make it depend on the parent which is what i did :P.
+
+``` js
+  this.state.recordings.map((recording) => (
+    <div key={recording.id}  style={{'minHeight': '100px'}}>
+      <LazyLoad height={'100%'} offsetTop={600} debounce={false}>
+        <Recording recording={recording} serviceHosts={this.props.serviceHosts} />
+      </LazyLoad>
+    </div>
+  ))
+```
+
 **Other improvements**
 
 Other improvments which will probably help if I can get to them are:
 
     - use redis to cache images and gpx files
-    - lazyload n recordings at a time, refresh when get to botoom of page
