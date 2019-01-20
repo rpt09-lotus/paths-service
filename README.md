@@ -109,6 +109,8 @@ This service uses the following dev stack:
 
 If you don't have PostgreSQL,It can be installed with brew. If you choose not to use brew or are using linux , please see this [article](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-18-04) on postgres installation
 
+Make sure that XCode is installed.  If XCode installed, make sure that you install command line tools via XCode.  Go to preferences -> Locations -> command line tools.  This will enable for when you npm install.  Please see this [node-gyp](https://github.com/nodejs/node-gyp) on command line tools installation.
+
 ``` sh
 # install npm dependencies
 $> cd /path/to/paths-service
