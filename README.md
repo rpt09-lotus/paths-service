@@ -30,7 +30,13 @@
 
 ## 1.2. To do
 
+  SDC   
+  
+  Generating 1M records is quite a challenege.  Since all of the seeding is being taken care of in the .sql file, having 1M lines of insert statements can bring up memory space.  To avoid this, a copy statement can be included in the current .sql file, which would take data from a generated .csv file.  Please see [psql-csv](http://www.postgresqltutorial.com/import-csv-file-into-posgresql-table/) for more info.  
+
+
 ```
+  FEC
   x speed tests
   - performance improvements
     x other
