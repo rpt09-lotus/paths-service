@@ -3,7 +3,7 @@ const requestPromise = require('request-promise');
 requestPromise.debug = false;
 
 module.exports = {
-  URL_PREFIX: 'https://s3.amazonaws.com/9trails-gpx/',
+  URL_PREFIX: 'https://s3.amazonaws.com/nine-trails-gpx/',
   getS3Url: function(file) {
     return `${this.URL_PREFIX}${file}`
   },
