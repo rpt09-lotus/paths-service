@@ -173,6 +173,9 @@ I found it interesting that postgresql:
   - Insert statements don't use double quotes, they're single so additional work to differentiate the two types had to be done.
   - Error descriptions for invalid sql syntax / schema syntax are much better in postsql.
 
+The schema handles paths 1 - 132.  For the SDC portion, 1M records is to be inserted.  Since 1M actual trails was not a realistic task, faker was used to generate fake trail names.  These were all initialized with a `false` flag for has_gpx_data.  This flag is handled in the backfill functions to use existing gpx data from paths 1-70.
+`SeedMill.js` is used to seed the database before the psql command to generate a csv file with a million records.  Once this is generated, a copy statement is run on the `schema.sql` file to populate the tables with the existing data. 
+
 ### 1.5.2. Setting up the API
 
 Setting up the api went fine.
