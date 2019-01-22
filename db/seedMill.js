@@ -13,7 +13,7 @@ const csvWriter = createCsvWriter({
 
 let trail_id, is_hero_path, gpx_url, have_gpx;
 const paths = [];
-for (let i = 133; i < 1000001; i++) {
+for (let i = 133; i < 10000001; i++) {
   paths.push({
     trail_id: i,
     is_hero_path: true,
