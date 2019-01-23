@@ -9,7 +9,7 @@
   },
   "scripts": {
     "server-dev": "nodemon --inspect server/index.js",
-    "seed-database": "node --max-old-space-size=4096 db/seedMill.js && psql 9trails-paths < db/schema.sql",
+    "seed-database": "node db/seedMill.js && psql 9trails-paths < db/schema.sql",
     "test": "jest ./test/",
     "connect": "ssh -i ~/.ssh/mine2.pem ec2-user@ec2-54-172-80-40.compute-1.amazonaws.com",
     "build": "NODE_ENV=production webpack --config ./webpack.config.js --mode=production",
@@ -34,6 +34,7 @@
     "body-parser": "^1.18.3",
     "canvas": "^2.2.0",
     "cors": "^2.8.5",
+    "csv-write-stream": "^2.0.0",
     "csv-writer": "^1.2.0",
     "dotenv": "^6.1.0",
     "express": "^4.16.4",

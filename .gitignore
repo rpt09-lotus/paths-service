@@ -31,5 +31,5 @@ gpxFiles/
 canonicalGpxFiles/
 cookies.txt
 gpxRecordings.txt
-*/paths.csv
+*/*.csv
 
