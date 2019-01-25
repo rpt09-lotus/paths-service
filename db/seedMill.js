@@ -17,7 +17,7 @@ const connection = {
   password: process.env.DB_PASS,
 };
 
-const { Client } = require('pg')
+const { Client } = require('pg');
 
 const client = new Client(connection);
 client.connect();
@@ -81,6 +81,10 @@ const seedHeros = (start) => {
         gpx_url: faker.lorem.words(),
         have_gpx: false
       });
+      if (i === START_TRAIL_RECORD) {
+        await csvHero.writeRecords(heroPaths);
+        heroPaths.length = 0;
+      }
       if (heroPaths.length > 99 || i === START_TRAIL_RECORD + TOTAL_TRAIL_RECORDS) {
         await csvHero.writeRecords(heroPaths);
         heroPaths.length = 0;
@@ -115,6 +119,11 @@ const seedRecordings = (start) => {
           have_gpx: false
         });
 
+        if (i === START_TRAIL_ID_RECORDING) {
+          await csvRecordings.writeRecords(recordings);
+          recordings.length = 0;
+        }
+
         if (recordings.length > 99 || i === START_TRAIL_ID_RECORDING + TOTAL_TRAIL_RECORDS && j === 3) {
           await csvRecordings.writeRecords(recordings);
           recordings.length = 0;
@@ -122,7 +131,7 @@ const seedRecordings = (start) => {
             let end = new Date();
             let seconds = (end.getTime() - start.getTime()) / 1000;
             resolve({
-              msg: `Done writing ${TOTAL_TRAIL_RECORDS * MAX_RECORDINGS_PER_TRAIL} recordings.csv in ${seconds} seconds`,
+              msg: `Done writing ${TOTAL_TRAIL_RECORDS * MAX_RECORDINGS_PER_TRAIL} records within recordings.csv in ${seconds} seconds`,
               time: seconds
             });
           }
@@ -133,27 +142,28 @@ const seedRecordings = (start) => {
 }
 
 const main = (async () => {
-  let start = new Date();
+  try {
+    //Seed hero paths
+    console.log('Creating hero.csv...');
+    let start = new Date();
+    const heroObj = await seedHeros(start);
+    console.log(heroObj.msg);
 
-  csvHero.writeRecords([])
-    .then(async () => {
-      console.log('Creating hero.csv...');
-      const heroObj = await seedHeros(start);
-      console.log(heroObj.msg);
-    });
-  
-  csvRecordings.writeRecords([])
-    .then(async () => {
-      console.log('Creating recordings.csv...');
-      const recordingsObj = await seedRecordings(start);
-      console.log(recordingsObj.msg);
-      let sqlTime = new Date();
-      await runSql();
-      let end = new Date();
-      let seconds = (end.getTime() - sqlTime.getTime()) / 1000;
-      console.log(`Done seeding db in ${seconds} seconds`)
-      let totalTime = (end.getTime() - start.getTime()) / 1000;
-      console.log('-----------------------------------');
-      console.log(`Total Time: ${totalTime} seconds`);
-    });
+    //Seed recordings
+    console.log('Creating recordings.csv...');
+    let startRecordings = new Date();
+    const recordingsObj = await seedRecordings(startRecordings);
+    console.log(recordingsObj.msg);
+    console.log('Seeding to db...');
+    let sqlTime = new Date();
+    await runSql();
+    let end = new Date();
+    let seconds = (end.getTime() - sqlTime.getTime()) / 1000;
+    console.log(`Done seeding ${TOTAL_TRAIL_RECORDS + TOTAL_TRAIL_RECORDS * MAX_RECORDINGS_PER_TRAIL} records within db in ${seconds} seconds`)
+    let totalTime = (end.getTime() - start.getTime()) / 1000;
+    console.log('-----------------------------------');
+    console.log(`Total Time: ${totalTime} seconds`);
+  } catch(err) {
+    console.log('error in seeding: ', err);
+  }
 })();
