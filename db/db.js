@@ -4,7 +4,7 @@ const pathUtils = require('../services/pathUtils.js');
 const dotenv = require('dotenv').config();
 
 const client = new Client({
-  database: '9trails-paths',
+  database: process.env.DB_NAME,
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
