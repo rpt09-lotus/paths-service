@@ -2,6 +2,7 @@ const fs = require('fs');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const path = require('path');
 const faker = require('faker');
+const dotenv = require('dotenv').config();
 
 const START_TRAIL_RECORD = 133;
 const START_TRAIL_ID_RECORDING = 21;
@@ -14,7 +15,7 @@ const MAX_ARRAY_LENGTH = 100;
 const connection = {
   user: process.env.DB_USER,
   host: process.env.HOST,
-  database: '9trails-paths',
+  database: process.env.DB_NAME,
   password: process.env.DB_PASS,
 };
 
@@ -59,7 +60,11 @@ const runSql = () => {
       }
     });
   }).then((data) => {
-    const sqlString = data.toString();
+    let sqlString;
+    const heroStr = /absolute\/path\/to\/db\/hero.csv/gi;
+    const recordingStr = /absolute\/path\/to\/db\/recordings.csv/gi;
+    sqlString = data.toString().replace(heroStr, process.env.ABS_PATH_TO_HERO_CSV)
+      .replace(recordingStr, process.env.ABS_PATH_TO_RECORDINGS_CSV);
     const qs = client.query(sqlString);
     return qs;
   });
@@ -74,71 +79,74 @@ const seededRandom = (seed) => {
 const seedHeros = (start) => {
   return new Promise( async (resolve, reject) => {
     const heroPaths = [];
-    for (let i = START_TRAIL_RECORD; i < START_TRAIL_RECORD + TOTAL_TRAIL_RECORDS + 1; i++) {
-      // console.log('length: ', heroPaths.length, 'i: ', i);
-      heroPaths.push({
-        trail_id: i,
-        is_hero_path: true,
-        gpx_url: faker.lorem.words(),
-        have_gpx: false
-      });
-      if (i === START_TRAIL_RECORD) {
-        await csvHero.writeRecords(heroPaths);
-        heroPaths.length = 0;
-      }
-      if (heroPaths.length > MAX_ARRAY_LENGTH - 1 || i === START_TRAIL_RECORD + TOTAL_TRAIL_RECORDS) {
-        await csvHero.writeRecords(heroPaths);
-        heroPaths.length = 0;
-        if (i === START_TRAIL_RECORD + TOTAL_TRAIL_RECORDS) {
-          let end = new Date();
-          let seconds = (end.getTime() - start.getTime()) / 1000;
-          resolve({
-            msg: `Done writing ${TOTAL_TRAIL_RECORDS} records within hero.csv in ${seconds} seconds`,
-            time: seconds
-          });
-        }
-      }
-    }
-  })
-}
-
-const seedRecordings = (start) => {
-  return new Promise( async (resolve) => {
-    const recordings = [];
-    for (let i = START_TRAIL_ID_RECORDING; i < START_TRAIL_ID_RECORDING + TOTAL_TRAIL_RECORDS + 1; i++) {
-      for (let j = 0; j < MAX_RECORDINGS_PER_TRAIL; j++) {
-        recordings.push({
+    try {
+      for (let i = START_TRAIL_RECORD; i < START_TRAIL_RECORD + TOTAL_TRAIL_RECORDS + 1; i++) {
+        heroPaths.push({
           trail_id: i,
-          gpx_id: Math.floor(seededRandom(i) * MAX_GPX_ID),
-          user_id: Math.floor(seededRandom(i) * (TOTAL_TRAIL_RECORDS + 1)),
-          date: Math.floor(seededRandom(i) * (LATEST_DATE) + 1),
-          rating: Math.floor(Math.random() * 2) ? null : Math.floor((Math.random() * 5) + 1),
-          comment: faker.lorem.words(),
-          tag: faker.lorem.word(),
-          is_hero_path: false,
+          is_hero_path: true,
           gpx_url: faker.lorem.words(),
           have_gpx: false
         });
 
-        if (i === START_TRAIL_ID_RECORDING) {
-          await csvRecordings.writeRecords(recordings);
-          recordings.length = 0;
-        }
-
-        if (recordings.length > MAX_ARRAY_LENGTH - 1 || i === START_TRAIL_ID_RECORDING + TOTAL_TRAIL_RECORDS && j === 3) {
-          await csvRecordings.writeRecords(recordings);
-          recordings.length = 0;
-          if (i === START_TRAIL_ID_RECORDING + TOTAL_TRAIL_RECORDS) {
+        if (heroPaths.length > MAX_ARRAY_LENGTH - 1 || i === START_TRAIL_RECORD + TOTAL_TRAIL_RECORDS) {
+          await csvHero.writeRecords(heroPaths);
+          heroPaths.length = 0;
+          if (i === START_TRAIL_RECORD + TOTAL_TRAIL_RECORDS) {
             let end = new Date();
             let seconds = (end.getTime() - start.getTime()) / 1000;
             resolve({
-              msg: `Done writing ${TOTAL_TRAIL_RECORDS * MAX_RECORDINGS_PER_TRAIL} records within recordings.csv in ${seconds} seconds`,
+              msg: `Done writing ${TOTAL_TRAIL_RECORDS} records within hero.csv in ${seconds} seconds`,
               time: seconds
             });
           }
         }
       }
-    } 
+    } catch(err) {
+      reject('error occured in seeding hero paths: ', err);
+    }
+  })
+}
+
+const seedRecordings = (start) => {
+  return new Promise( async (resolve, reject) => {
+    const recordings = [];
+    try {
+      for (let i = START_TRAIL_ID_RECORDING; i < START_TRAIL_ID_RECORDING + TOTAL_TRAIL_RECORDS + 1; i++) {
+        for (let j = 0; j < MAX_RECORDINGS_PER_TRAIL; j++) {
+          recordings.push({
+            trail_id: i,
+            gpx_id: Math.floor(seededRandom(i) * MAX_GPX_ID),
+            user_id: Math.floor(seededRandom(i) * (TOTAL_TRAIL_RECORDS + 1)),
+            date: Math.floor(seededRandom(i) * (LATEST_DATE) + 1),
+            rating: Math.floor(Math.random() * 2) ? null : Math.floor((Math.random() * 5) + 1),
+            comment: faker.lorem.words(),
+            tag: faker.lorem.word(),
+            is_hero_path: false,
+            gpx_url: faker.lorem.words(),
+            have_gpx: false
+          });
+  
+          if (
+            (recordings.length > MAX_ARRAY_LENGTH - 1) 
+            || (i === START_TRAIL_ID_RECORDING + TOTAL_TRAIL_RECORDS) 
+            && (MAX_RECORDINGS_PER_TRAIL - 1 === 3)
+          ) {
+            await csvRecordings.writeRecords(recordings);
+            recordings.length = 0;
+            if (i === START_TRAIL_ID_RECORDING + TOTAL_TRAIL_RECORDS) {
+              let end = new Date();
+              let seconds = (end.getTime() - start.getTime()) / 1000;
+              resolve({
+                msg: `Done writing ${TOTAL_TRAIL_RECORDS * MAX_RECORDINGS_PER_TRAIL} records within recordings.csv in ${seconds} seconds`,
+                time: seconds
+              });
+            }
+          }
+        }
+      } 
+    } catch(err) {
+      reject('error occured in seeding recordings: ', err);
+    }
   });
 }
 
@@ -162,7 +170,10 @@ const main = (async () => {
     await runSql();
     let end = new Date();
     let seconds = (end.getTime() - sqlTime.getTime()) / 1000;
-    console.log(`Done seeding ${TOTAL_TRAIL_RECORDS + TOTAL_TRAIL_RECORDS * MAX_RECORDINGS_PER_TRAIL} records within db in ${seconds} seconds`)
+    const totalRecords = TOTAL_TRAIL_RECORDS + TOTAL_TRAIL_RECORDS * MAX_RECORDINGS_PER_TRAIL;
+    console.log(`Done seeding ${totalRecords} records within db in ${seconds} seconds`)
+
+    //Calculate time from start to end
     let totalTime = (end.getTime() - start.getTime()) / 1000;
     console.log('-----------------------------------');
     console.log(`Total Time: ${totalTime} seconds`);

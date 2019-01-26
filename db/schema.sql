@@ -147,7 +147,7 @@ INSERT INTO paths (trail_id, is_hero_path, gpx_url, have_gpx) VALUES (129,true,'
 INSERT INTO paths (trail_id, is_hero_path, gpx_url, have_gpx) VALUES (130,true,'powers-landing-trail.gpx',false);
 INSERT INTO paths (trail_id, is_hero_path, gpx_url, have_gpx) VALUES (131,true,'twin-peaks-loop.gpx',false);
 INSERT INTO paths (trail_id, is_hero_path, gpx_url, have_gpx) VALUES (132,true,'sky-camp-trail.gpx',false);
-COPY paths(trail_id, is_hero_path, gpx_url, have_gpx) FROM '/Users/kento/Code/HR/SDC/paths-service/db/hero.csv' (FORMAT CSV, DELIMITER ',', HEADER);
+COPY paths(trail_id, is_hero_path, gpx_url, have_gpx) FROM 'absolute/path/to/db/hero.csv' (FORMAT CSV, DELIMITER ',', HEADER);
 
 INSERT INTO paths (trail_id, gpx_id, user_id, date, rating, comment, tag, is_hero_path, gpx_url, have_gpx) VALUES (20,21761827,4,1542781380503,null,'Wiliwilinui Ridge 1','hiking',false,'21761827.gpx',true);
 INSERT INTO paths (trail_id, gpx_id, user_id, date, rating, comment, tag, is_hero_path, gpx_url, have_gpx) VALUES (20,21996973,9,1542783368442,null,'wiliwilenui ridge','hiking',false,'21996973.gpx',true);
@@ -625,4 +625,4 @@ INSERT INTO paths (trail_id, gpx_id, user_id, date, rating, comment, tag, is_her
 INSERT INTO paths (trail_id, gpx_id, user_id, date, rating, comment, tag, is_hero_path, gpx_url, have_gpx) VALUES (2,11558632,16,1341126000000,null,'Crescent Creek Trail','hiking',false,'11558632.gpx',false);
 INSERT INTO paths (trail_id, gpx_id, user_id, date, rating, comment, tag, is_hero_path, gpx_url, have_gpx) VALUES (2,21301056,4,1542780911373,5,'Crescent Creek w/ W & BRO','hiking',false,'21301056.gpx',false);
 INSERT INTO paths (trail_id, gpx_id, user_id, date, rating, comment, tag, is_hero_path, gpx_url, have_gpx) VALUES (2,13476702,20,1464764400000,null,'Carter/Crescent Lake Trail','hiking',false,'13476702.gpx',false);
-COPY paths(trail_id, gpx_id, user_id, date, rating, comment, tag, is_hero_path, gpx_url, have_gpx) FROM '/Users/kento/Code/HR/SDC/paths-service/db/recordings.csv' (FORMAT CSV, DELIMITER ',', HEADER);
+COPY paths(trail_id, gpx_id, user_id, date, rating, comment, tag, is_hero_path, gpx_url, have_gpx) FROM 'absolute/path/to/db/recordings.csv' (FORMAT CSV, DELIMITER ',', HEADER);
