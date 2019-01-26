@@ -9,6 +9,7 @@ const TOTAL_TRAIL_RECORDS = 10000000;
 const LATEST_DATE = 1548208265331;
 const MAX_GPX_ID = 22000001;
 const MAX_RECORDINGS_PER_TRAIL = 4;
+const MAX_ARRAY_LENGTH = 100;
 
 const connection = {
   user: process.env.DB_USER,
@@ -85,7 +86,7 @@ const seedHeros = (start) => {
         await csvHero.writeRecords(heroPaths);
         heroPaths.length = 0;
       }
-      if (heroPaths.length > 99 || i === START_TRAIL_RECORD + TOTAL_TRAIL_RECORDS) {
+      if (heroPaths.length > MAX_ARRAY_LENGTH - 1 || i === START_TRAIL_RECORD + TOTAL_TRAIL_RECORDS) {
         await csvHero.writeRecords(heroPaths);
         heroPaths.length = 0;
         if (i === START_TRAIL_RECORD + TOTAL_TRAIL_RECORDS) {
@@ -124,7 +125,7 @@ const seedRecordings = (start) => {
           recordings.length = 0;
         }
 
-        if (recordings.length > 99 || i === START_TRAIL_ID_RECORDING + TOTAL_TRAIL_RECORDS && j === 3) {
+        if (recordings.length > MAX_ARRAY_LENGTH - 1 || i === START_TRAIL_ID_RECORDING + TOTAL_TRAIL_RECORDS && j === 3) {
           await csvRecordings.writeRecords(recordings);
           recordings.length = 0;
           if (i === START_TRAIL_ID_RECORDING + TOTAL_TRAIL_RECORDS) {
