@@ -61,8 +61,8 @@ const runSql = () => {
     });
   }).then((data) => {
     let sqlString;
-    const heroStr = /absolute\/path\/to\/hero.csv/gi;
-    const recordingStr = /absolute\/path\/to\/recordings.csv/gi;
+    const heroStr = /absolute\/path\/to\/db\/hero.csv/gi;
+    const recordingStr = /absolute\/path\/to\/db\/recordings.csv/gi;
     sqlString = data.toString().replace(heroStr, process.env.ABS_PATH_TO_HERO_CSV)
       .replace(recordingStr, process.env.ABS_PATH_TO_RECORDINGS_CSV);
     const qs = client.query(sqlString);
