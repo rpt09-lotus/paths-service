@@ -147,7 +147,7 @@ INSERT INTO paths (trail_id, is_hero_path, gpx_url, have_gpx) VALUES (129,true,'
 INSERT INTO paths (trail_id, is_hero_path, gpx_url, have_gpx) VALUES (130,true,'powers-landing-trail.gpx',false);
 INSERT INTO paths (trail_id, is_hero_path, gpx_url, have_gpx) VALUES (131,true,'twin-peaks-loop.gpx',false);
 INSERT INTO paths (trail_id, is_hero_path, gpx_url, have_gpx) VALUES (132,true,'sky-camp-trail.gpx',false);
-COPY paths(trail_id, is_hero_path, gpx_url, have_gpx) FROM '/Users/kento/Code/HR/SDC/paths-service/db/hero.csv' (FORMAT CSV, DELIMITER ',', HEADER);;
+COPY paths(trail_id, is_hero_path, gpx_url, have_gpx) FROM '/Users/kento/Code/HR/SDC/paths-service/db/hero.csv' (FORMAT CSV, DELIMITER ',', HEADER);
 
 INSERT INTO paths (trail_id, gpx_id, user_id, date, rating, comment, tag, is_hero_path, gpx_url, have_gpx) VALUES (20,21761827,4,1542781380503,null,'Wiliwilinui Ridge 1','hiking',false,'21761827.gpx',true);
 INSERT INTO paths (trail_id, gpx_id, user_id, date, rating, comment, tag, is_hero_path, gpx_url, have_gpx) VALUES (20,21996973,9,1542783368442,null,'wiliwilenui ridge','hiking',false,'21996973.gpx',true);
