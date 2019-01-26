@@ -144,17 +144,19 @@ const seedRecordings = (start) => {
 
 const main = (async () => {
   try {
-    //Seed hero paths
+    //Seed hero paths (write to hero.csv)
     console.log('Creating hero.csv...');
     let start = new Date();
     const heroObj = await seedHeros(start);
     console.log(heroObj.msg);
 
-    //Seed recordings
+    //Seed recordings (write to recordings.csv)
     console.log('Creating recordings.csv...');
     let startRecordings = new Date();
     const recordingsObj = await seedRecordings(startRecordings);
     console.log(recordingsObj.msg);
+
+    //Seed db (run schema.sql -> copy csv files to db)
     console.log('Seeding to db...');
     let sqlTime = new Date();
     await runSql();
