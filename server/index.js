@@ -1,5 +1,7 @@
+require('dotenv').config();
+
 const express = require('express');
-const db = require('../db/db.js');
+const db = process.env.DB_TYPE === 'postgres' ? require('../db/postgres.js') : require('../db/cassandra.js');
 const validator = require('../services/validator.js');
 const bodyParser = require('body-parser');
 const app = express();

@@ -3,70 +3,162 @@ const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const path = require('path');
 const faker = require('faker');
 const dotenv = require('dotenv').config();
+const { exec } = require('child_process');
 
 const START_TRAIL_RECORD = 133;
 const START_TRAIL_ID_RECORDING = 21;
-const TOTAL_TRAIL_RECORDS = 10000000;
+const TOTAL_TRAIL_RECORDS = 100;
 const LATEST_DATE = 1548208265331;
 const MAX_GPX_ID = 22000001;
-const MAX_RECORDINGS_PER_TRAIL = 4;
+const MAX_RECORDINGS_PER_TRAIL = 2;
 const MAX_ARRAY_LENGTH = 100;
+let id_count = 608;
 
-const connection = {
-  user: process.env.DB_USER,
-  host: process.env.HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASS,
-};
+const DB_TYPE = process.env.DB_TYPE;
 
-const { Client } = require('pg');
+let client;
+let csvHero, csvRecordings;
 
-const client = new Client(connection);
-client.connect();
+if (DB_TYPE === 'postgres') {
+  console.log('inside postgres');
+  const connection = {
+    user: process.env.DB_USER,
+    host: process.env.HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASS,
+  };
+  
+  const { Client } = require('pg');
+  
+  client = new Client(connection);
+  client.connect();
 
-const csvHero = createCsvWriter({
-  path: 'db/hero.csv',
-  header: [
-    {id: 'trail_id', title:'trail_id'},
-    {id: 'is_hero_path', title: 'is_hero_path'},
-    {id: 'gpx_url', title: 'gpx_url'},
-    {id: 'have_gpx', title: 'have_gpx'}
-  ]
-});
+  csvHero = createCsvWriter({
+    path: 'db/hero.csv',
+    header: [
+      {id: 'trail_id', title:'trail_id'},
+      {id: 'is_hero_path', title: 'is_hero_path'},
+      {id: 'gpx_url', title: 'gpx_url'},
+      {id: 'have_gpx', title: 'have_gpx'}
+    ]
+  });
+  csvRecordings = createCsvWriter({
+    path: 'db/recordings.csv',
+    header: [
+      {id: 'trail_id', title: 'trail_id'},
+      {id: 'gpx_id', title: 'gpx_id'},
+      {id: 'user_id', title: 'user_id'},
+      {id: 'date', title: 'date'},
+      {id: 'rating', title: 'rating'},
+      {id: 'comment', title: 'comment'},
+      {id: 'tag', title: 'tag'},
+      {id: 'is_hero_path', title: 'is_hero_path'},
+      {id: 'gpx_url', title: 'gpx_url'},
+      {id: 'have_gpx', title: 'have_gpx'}
+    ]
+  });
+} 
+if (DB_TYPE === 'cassandra') {
+  console.log('inside cassandra');
+  const cassandra = require('cassandra-driver');
 
-const csvRecordings = createCsvWriter({
-  path: 'db/recordings.csv',
-  header: [
-    {id: 'trail_id', title: 'trail_id'},
-    {id: 'gpx_id', title: 'gpx_id'},
-    {id: 'user_id', title: 'user_id'},
-    {id: 'date', title: 'date'},
-    {id: 'rating', title: 'rating'},
-    {id: 'comment', title: 'comment'},
-    {id: 'tag', title: 'tag'},
-    {id: 'is_hero_path', title: 'is_hero_path'},
-    {id: 'gpx_url', title: 'gpx_url'},
-    {id: 'have_gpx', title: 'have_gpx'}
-  ]
-});
+  client = new cassandra.Client({
+    contactPoints: ['127.0.0.1'], 
+    keyspace: process.env.CASSANDRA_DB_NAME,
+    localDataCenter: 'datacenter1'
+  });
+  csvHero = createCsvWriter({
+    path: 'db/hero.csv',
+    header: [
+      {id: 'id', title: 'id'},
+      {id: 'trail_id', title: 'trail_id'},
+      {id: 'gpx_id', title: 'gpx_id'},
+      {id: 'user_id', title: 'user_id'},
+      {id: 'date', title: 'date'},
+      {id: 'rating', title: 'rating'},
+      {id: 'comment', title: 'comment'},
+      {id: 'tag', title: 'tag'},
+      {id: 'is_hero_path', title: 'is_hero_path'},
+      {id: 'gpx_url', title: 'gpx_url'},
+      {id: 'have_gpx', title: 'have_gpx'}
+    ]
+  });
+  csvRecordings = createCsvWriter({
+    path: 'db/recordings.csv',
+    header: [
+      {id: 'id', title: 'id'},
+      {id: 'trail_id', title: 'trail_id'},
+      {id: 'gpx_id', title: 'gpx_id'},
+      {id: 'user_id', title: 'user_id'},
+      {id: 'date', title: 'date'},
+      {id: 'rating', title: 'rating'},
+      {id: 'comment', title: 'comment'},
+      {id: 'tag', title: 'tag'},
+      {id: 'is_hero_path', title: 'is_hero_path'},
+      {id: 'gpx_url', title: 'gpx_url'},
+      {id: 'have_gpx', title: 'have_gpx'}
+    ]
+  });
+}
 
-const runSql = () => {
+
+const copyCass = () => {
+  return new Promise(resolve => {
+    const fileNames = ['hero', 'recordings'];
+    const copies = fileNames.map(filename => {
+      console.log('filename: ', filename);
+      const command = `cqlsh -e "COPY ntrailspaths.paths \
+        (id, trail_id, gpx_id, user_id, date, rating, comment, tag, is_hero_path, gpx_url, have_gpx) \
+        FROM '${process.env.ABS_PATH_TO_DB_FOLDER}/${filename}.csv' WITH HEADER= TRUE;"`;
+      return new Promise((resolve, reject) => {
+        exec(command, (err, stdout, stderr) => {
+          if (err) {
+            reject(err);
+          }
+          // the *entire* stdout and stderr (buffered)
+          // console.log(`stdout: ${stdout}`);
+          // console.log(`stderr: ${stderr}`);
+          resolve();
+        });
+      });
+    });
+    Promise.all(copies).then(() => {
+      console.log('completed copying to cassandra');
+      resolve();
+    });
+  })
+}
+
+const runSql = (params=[]) => {
   return new Promise((resolve, reject) => {
-    fs.readFile(path.resolve(__dirname + '/schema.sql'), (err, data) => {
+    const filepath = DB_TYPE === 'postgres' ? '/postgres.sql' : '/cassandra.cql'; 
+    fs.readFile(path.resolve(__dirname + filepath), (err, data) => {
       if (err) {
         reject(err);
       } else {
         resolve(data);
       }
     });
-  }).then((data) => {
+  }).then( async (data) => {
     let sqlString;
     const heroStr = /absolute\/path\/to\/db\/hero.csv/gi;
     const recordingStr = /absolute\/path\/to\/db\/recordings.csv/gi;
-    sqlString = data.toString().replace(heroStr, process.env.ABS_PATH_TO_HERO_CSV)
-      .replace(recordingStr, process.env.ABS_PATH_TO_RECORDINGS_CSV);
-    const qs = client.query(sqlString);
-    return qs;
+    sqlString = data.toString().replace(heroStr, process.env.ABS_PATH_TO_DB_FOLDER + '/hero.csv')
+      .replace(recordingStr, process.env.ABS_PATH_TO_DB_FOLDER + '/recordings.csv');
+    let query;
+    if (DB_TYPE === 'postgres') {
+      query = await client.query(sqlString);
+    } 
+    if (DB_TYPE === 'cassandra') {
+      const queries = sqlString.split(';').slice(0, -1).map((query) => {
+        return query;
+      });
+      for (let query of queries) {
+        await client.execute(query, params,  { prepare: true });
+      }
+      await copyCass();
+    }
+    return query;
   });
 }
 
@@ -81,13 +173,30 @@ const seedHeros = (start) => {
     const heroPaths = [];
     try {
       for (let i = START_TRAIL_RECORD; i < START_TRAIL_RECORD + TOTAL_TRAIL_RECORDS + 1; i++) {
-        heroPaths.push({
-          trail_id: i,
-          is_hero_path: true,
-          gpx_url: faker.lorem.words(),
-          have_gpx: false
-        });
-
+        id_count++;
+        if (DB_TYPE === 'postgres') {
+          heroPaths.push({
+            trail_id: i,
+            is_hero_path: true,
+            gpx_url: faker.lorem.words(),
+            have_gpx: false
+          });
+        }
+        if (DB_TYPE === 'cassandra') {
+          heroPaths.push({
+            id: id_count,
+            trail_id: i,
+            gpx_id: null,
+            user_id: null,
+            date: null,
+            rating: 0,
+            comment: null,
+            tag: null,
+            is_hero_path: true,
+            gpx_url: faker.lorem.words(),
+            have_gpx: false
+          });
+        }
         if (heroPaths.length > MAX_ARRAY_LENGTH - 1 || i === START_TRAIL_RECORD + TOTAL_TRAIL_RECORDS) {
           await csvHero.writeRecords(heroPaths);
           heroPaths.length = 0;
@@ -113,6 +222,7 @@ const seedRecordings = (start) => {
     try {
       for (let i = START_TRAIL_ID_RECORDING; i < START_TRAIL_ID_RECORDING + TOTAL_TRAIL_RECORDS + 1; i++) {
         for (let j = 0; j < MAX_RECORDINGS_PER_TRAIL; j++) {
+          id_count++;
           recordings.push({
             trail_id: i,
             gpx_id: Math.floor(seededRandom(i) * MAX_GPX_ID),
@@ -125,11 +235,14 @@ const seedRecordings = (start) => {
             gpx_url: faker.lorem.words(),
             have_gpx: false
           });
-  
+          if (DB_TYPE === 'cassandra') {
+            recordings[recordings.length - 1].id = id_count;
+          }
+
           if (
             (recordings.length > MAX_ARRAY_LENGTH - 1) 
             || (i === START_TRAIL_ID_RECORDING + TOTAL_TRAIL_RECORDS) 
-            && (MAX_RECORDINGS_PER_TRAIL - 1 === 3)
+            && (MAX_RECORDINGS_PER_TRAIL - 1 === j)
           ) {
             await csvRecordings.writeRecords(recordings);
             recordings.length = 0;
