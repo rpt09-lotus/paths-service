@@ -7,14 +7,14 @@ const { exec } = require('child_process');
 
 const START_TRAIL_RECORD = 133;
 const START_TRAIL_ID_RECORDING = 21;
-const TOTAL_TRAIL_RECORDS = 100;
+const TOTAL_TRAIL_RECORDS = 1000;
 const LATEST_DATE = 1548208265331;
 const MAX_GPX_ID = 22000001;
-const MAX_RECORDINGS_PER_TRAIL = 2;
+const MAX_RECORDINGS_PER_TRAIL = 1;
 const MAX_ARRAY_LENGTH = 100;
 let id_count = 608;
 
-const DB_TYPE = process.env.DB_TYPE;
+const DB_TYPE = process.env.DB_TYPE  || 'postgres';
 
 let client;
 let csvHero, csvRecordings;
@@ -290,7 +290,9 @@ const main = (async () => {
     let totalTime = (end.getTime() - start.getTime()) / 1000;
     console.log('-----------------------------------');
     console.log(`Total Time: ${totalTime} seconds`);
+    process.exit();
   } catch(err) {
     console.log('error in seeding: ', err);
+    process.exit();
   }
 })();

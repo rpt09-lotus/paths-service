@@ -1,5 +1,5 @@
 const requestPromise = require('request-promise');
-const db = require('../db/db.js');
+const db = require('../db/postgres.js');
 const mbgl = require('@mapbox/mapbox-gl-native');
 const path = require('path');
 const mbvp = require('@mapbox/geo-viewport');

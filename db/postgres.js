@@ -255,6 +255,8 @@ module.exports = {
   },
   formatIndividualPath: function(data, redividePath = null) {
     return this.formatDataAll(data.rows, [...this.baseFormatting, 'gpx_data']).then((data) => {
+      console.log('formatIndividualPath..');
+      console.log('data: ', data);
       if (redividePath) {
         data[0].gpx_data.redividedPoints = pathUtils.redividePath(data[0].gpx_data.points, redividePath);
         return data;

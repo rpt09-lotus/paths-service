@@ -1,5 +1,5 @@
 const { Client } = require('pg');
-const db = require('../../db/db.js');
+const db = require('../../db/postgres.js');
 const dotenv = require('dotenv').config();
 
 

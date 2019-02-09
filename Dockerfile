@@ -26,9 +26,17 @@ RUN apt-get update \
   && apt-get -y install xvfb
 
 # install npm
-ENV NODE_ENV=production
+ENV NODE_ENV='production'
 RUN npm install
 ENV LD_PRELOAD='/app/node_modules/sharp/vendor/lib/libz.so'
+ENV PORT=80
+ENV HOST='localhost'
+ENV DB_USER='docker'
+ENV DB_NAME='9trails-paths'
+ENV DB_PASS='docker'
+ENV ABS_PATH_TO_DB_FOLDER='/app/db'
+ENV DB_TYPE='postgres'
+
 #expose pg + node
 EXPOSE 80 5432
 # run our shell script
@@ -38,5 +46,6 @@ CMD start-stop-daemon --start --pidfile ~/xvfb.pid --make-pidfile --background -
 &&/etc/init.d/postgresql start \
 && sudo -u postgres psql --command "CREATE USER docker WITH SUPERUSER PASSWORD 'docker';" \
 && sudo -u postgres createdb -O docker 9trails-paths \
-&& sudo PGPASSWORD='docker' -u postgres psql -d 9trails-paths -U docker -h 127.0.0.1 -p 5432 < db/schema.sql \
+&& sudo PGPASSWORD='docker' -u postgres psql -d 9trails-paths -U docker -h 127.0.0.1 -p 5432 \
+&& node db/seedMill.js \
 && node server/index.js
