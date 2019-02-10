@@ -7,7 +7,7 @@ const { exec } = require('child_process');
 
 const START_TRAIL_RECORD = 133;
 const START_TRAIL_ID_RECORDING = 21;
-const TOTAL_TRAIL_RECORDS = 1000;
+const TOTAL_TRAIL_RECORDS = 10000000;
 const LATEST_DATE = 1548208265331;
 const MAX_GPX_ID = 22000001;
 const MAX_RECORDINGS_PER_TRAIL = 1;
@@ -158,6 +158,7 @@ const runSql = (params=[]) => {
       }
       await copyCass();
     }
+
     return query;
   });
 }
@@ -263,6 +264,26 @@ const seedRecordings = (start) => {
   });
 }
 
+const deleteCsv = () => {
+  const fileNames = ['hero', 'recordings'];
+  return new Promise((resolve, reject) => {
+    const deletes = fileNames.map(file => {
+      return new Promise((resolve, reject) => {
+        fs.unlink(`db/${file}.csv`, (err) => {
+          if (err) {
+            reject(err);
+          } 
+          resolve(`successfully deleted db/${file}`);
+        });
+      });
+    });
+    Promise.all(deletes).then(() => {
+      console.log('completed deleting csv files');
+      resolve();
+    });
+  })
+}
+
 const main = (async () => {
   try {
     //Seed hero paths (write to hero.csv)
@@ -283,6 +304,8 @@ const main = (async () => {
     await runSql();
     let end = new Date();
     let seconds = (end.getTime() - sqlTime.getTime()) / 1000;
+    console.log('deleting .csv files...');
+    await deleteCsv();
     const totalRecords = TOTAL_TRAIL_RECORDS + TOTAL_TRAIL_RECORDS * MAX_RECORDINGS_PER_TRAIL;
     console.log(`Done seeding ${totalRecords} records within db in ${seconds} seconds`)
 

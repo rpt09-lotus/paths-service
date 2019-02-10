@@ -142,7 +142,11 @@ module.exports = {
       'gpx_data': async (val, obj) => {
         let gpxData = null;
         try {
-          gpxData = await awsHelper.readGPXByUrl( awsHelper.getS3Url(obj.gpx_url));
+          if (!pathObject.have_gpx) {
+            gpxData = await this.backfillNonExistentGPX(obj);
+          } else {
+            gpxData = await awsHelper.readGPXByUrl( awsHelper.getS3Url(obj.gpx_url));
+          }
         } catch (e) {
           console.log('error: couldn\'t parse obj.gpx_url:', e);
           // we can't get all gpx data so we will backfill with a random val
