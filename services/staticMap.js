@@ -17,7 +17,7 @@ const staticMap = module.exports = {
     return stream;
   },
   renderStaticMap: (pathId, width = 800, height = 300, drawChart = true, mode = 'svg') => {
-    console.log('rendering starting now..');
+    // console.log('rendering starting now..');
     const modifier = 0.45;
     return db.getPathById(pathId).then((result) => {
       width = Number(width);
@@ -103,9 +103,9 @@ const staticMap = module.exports = {
         ];
         const calcBounds = mbvp.bounds(centerPt, ZOOM, [width * .5, height * .5]);
         // const calvViewport = mbvp.viewport(calcBounds, [0])
-        console.log('bounds:', calcBounds);
+        // console.log('bounds:', calcBounds);
         const convertedPixels = pathUtils.convertToPX(centerPt, calcBounds, width, height);
-        console.log('converted pixels:', convertedPixels);
+        // console.log('converted pixels:', convertedPixels);
         map.render({
           width: width,
           height: height,
@@ -127,7 +127,7 @@ const staticMap = module.exports = {
             }
           });
           
-          console.log('creating image buffer');
+          // console.log('creating image buffer');
           return image.png().toBuffer()
             .then ( (buffer) => {
               if (drawChart) {

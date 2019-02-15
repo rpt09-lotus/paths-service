@@ -110,7 +110,6 @@ module.exports = {
           return awsHelper.getS3Url(url);
         });
         const randomGPXBackfill = validGPXPool[Math.floor(this.seededRandom(obj.id) * validGPXPool.length)];
-        console.log('backfilling with random gpx backfill:', randomGPXBackfill);
         const json = await awsHelper.readGPXByUrl(randomGPXBackfill);
         // edit obj to preserve true (but broken gpx url)
         obj.backfilled_gpx_url = randomGPXBackfill;
@@ -142,6 +141,7 @@ module.exports = {
       'gpx_data': async (val, obj) => {
         let gpxData = null;
         try {
+          // gpxData = await awsHelper.readGPXByUrl(awsHelper.getS3Url(obj.gpx_url));
           if (!pathObject.have_gpx) {
             gpxData = await this.backfillNonExistentGPX(obj);
           } else {
@@ -234,7 +234,6 @@ module.exports = {
       return this.formatDataAll(data.rows, [...this.baseFormatting]);
     }).then(data => {
       const backfillAmount = 1 + Math.floor( this.seededRandom(id) * MAX_EXTRA_RECORDINGS);
-      console.log(backfillAmount);
       return Array.from({length: backfillAmount}).map((item, index) => {
         item = data[Math.floor(this.seededRandom(id * (index + 1)) * data.length)];
         item.backfilled_recording = true;
@@ -259,8 +258,6 @@ module.exports = {
   },
   formatIndividualPath: function(data, redividePath = null) {
     return this.formatDataAll(data.rows, [...this.baseFormatting, 'gpx_data']).then((data) => {
-      console.log('formatIndividualPath..');
-      console.log('data: ', data);
       if (redividePath) {
         data[0].gpx_data.redividedPoints = pathUtils.redividePath(data[0].gpx_data.points, redividePath);
         return data;

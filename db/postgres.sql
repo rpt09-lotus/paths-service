@@ -15,6 +15,7 @@ CREATE TABLE paths (
       PRIMARY KEY (id)
 );
 
+CREATE INDEX trail_idx on paths(trail_id);
 INSERT INTO paths (trail_id, is_hero_path, gpx_url, have_gpx) VALUES (1,true,'01_Golden Gate Park Trail.gpx',true);
 INSERT INTO paths (trail_id, is_hero_path, gpx_url, have_gpx) VALUES (2,true,'02_Crescent Creek Trail.gpx',true);
 INSERT INTO paths (trail_id, is_hero_path, gpx_url, have_gpx) VALUES (3,true,'03_Hope Point.gpx',true);
