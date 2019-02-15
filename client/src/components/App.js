@@ -20,6 +20,7 @@ ns.CanonicalPath = class CanonicalPath extends React.Component {
   }
 
   componentDidMount() {
+    console.log('path: ', SERVICE_HOSTS.paths);
     const url = `${SERVICE_HOSTS.paths}/${this.state.trailId}/heroPath`;
     fetch(url)
       .then(response => {

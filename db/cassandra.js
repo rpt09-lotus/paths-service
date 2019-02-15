@@ -1,16 +1,13 @@
-const { Client } = require('pg');
+const cassandra = require('cassandra-driver');
 const awsHelper = require('../services/aws.js');
 const pathUtils = require('../services/pathUtils.js');
 const dotenv = require('dotenv').config();
 
-const client = new Client({
-  database: process.env.DB_NAME,
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
+const client = new cassandra.Client({
+  contactPoints: ['127.0.0.1'], 
+  keyspace: process.env.CASSANDRA_DB_NAME,
+  localDataCenter: 'datacenter1'
 });
-
-client.connect();
 
 module.exports = {
   /**
